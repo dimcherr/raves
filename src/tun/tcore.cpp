@@ -1,0 +1,36 @@
+#include "tun/tcore.h"
+#include "state.h"
+#include "data/devent.h"
+#include "comp/cphys.h"
+
+void tun::LockMouse(bool mouseLocked) {
+    sapp_lock_mouse(mouseLocked);
+    sapp_show_mouse(!mouseLocked);
+}
+
+Thing<TweenComp> tun::CreateTween(float speed, TweenComp::Type type, float offset) {
+    Thing<TweenComp> tween {};
+    tween.entity = reg.create();
+    auto& tweenComp = reg.emplace<TweenComp>(tween.entity, speed, type);
+    tweenComp.onEnd = tun::CreateEvent();
+    return tween;
+}
+
+Thing<EventComp> tun::CreateEvent(bool ongoing) {
+    Thing<EventComp> event {};
+    event.entity = reg.create();
+    reg.emplace<EventComp>(event.entity, ongoing);
+    return event;
+}
+
+void tun::UpdateTransform(Entity entity) {
+    if (auto* transform = reg.try_get<TransformComp>(entity)) {
+        Matrix t = glm::translate({1.f}, transform->translation);
+        Matrix r = glm::mat4_cast(transform->rotation);
+        Matrix s = glm::scale({1.f}, transform->scale);
+        transform->transform = t * r * s;
+        if (auto* boxShape = reg.try_get<BoxShapeComp>(entity)) {
+            boxShape->transformedBoundingBox = tun::TransformAABB(transform->transform, boxShape->boundingBox, boxShape->offset, boxShape->size);
+        }
+    }
+}

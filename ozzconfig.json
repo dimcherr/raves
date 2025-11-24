@@ -1,0 +1,20 @@
+{
+  "skeleton":
+  {
+    "import" : 
+    {
+      "enable" : true,
+      "raw" : false,
+      "types" : 
+      {
+        "skeleton" : true,
+        "marker" : false,
+        "camera" : false,
+        "geometry" : false,
+        "light" : false,
+        "null" : false,
+        "any" : false
+      }
+    }
+  }
+}

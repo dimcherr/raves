@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>Raves</title>
+    <style>
+        body { 
+          margin: 0;
+          background-color: black;
+          justify-content: center;
+          align-items: center;
+          background: #000;
+          display: flex;
+          height: 100vh;
+          padding: 0;
+          margin: 0;
+        }
+        .game {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            margin: 0px;
+            border: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: block;
+            image-rendering: optimizeSpeed;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -o-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+            -ms-interpolation-mode: nearest-neighbor;
+        }
+        
+        .progress {
+          background: rgba(255,255,255,0.1);
+          justify-content: flex-start;
+          border-radius: 0px;
+          align-items: center;
+          position: relative;
+          padding: 0 5px;
+          display: flex;
+          height: 40px;
+          width: 500px;
+        }
+
+        .progress-value {
+          animation: load 5s normal forwards;
+          box-shadow: 0px 0px 256px 8px #c4ff00;
+          border-radius: 0px;
+          background: #75ec04;
+          height: 30px;
+          width: 0;
+        }
+
+        .progress-nesobaka {
+          display: flex;
+          width: 100%;
+          justify-content: center;
+          margin-bottom: 32px;
+        }
+
+        .loadingScreen {
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          display: flex;
+        }
+
+        @keyframes load {
+          0% { width: 0; }
+          100% { width: 100%; }
+        }
+    </style>
+  </head>
+  <body>
+    <canvas tabindex="0" class="game" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    <div id="loadingBlob" class="loadingScreen">
+      <div class="progress-nesobaka"><img src="nesobaka.gif" /></div>
+      <div class="progress">
+        <div class="progress-value"></div>
+      </div>
+    </div>
+    <script type='text/javascript'>
+      var Module = {
+        preRun: [],
+        print: (...args) => console.log('[stdout]: ' + args.join(' ')),
+        printErr: (...args) => console.log('[stderr]: ' + args.join(' ')),
+        onWebLoad: function() {
+          document.getElementById("loadingBlob").remove();
+        },
+      };
+      window.onerror = (event) => console.log('[onerror]: ' + event.message);
+    </script>
+    {{{ SCRIPT }}}
+  </body>
+</html>

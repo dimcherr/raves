@@ -1,0 +1,5 @@
+CompileFlags:
+  Add: ['-ferror-limit=0']
+Diagnostics:
+  Suppress: ['*', 'fatal_too_many_errors']
+

@@ -1,0 +1,7 @@
+CompileFlags:                     # Tweak the parse settings
+  Add: 
+    - "-Wno-nonportable-include-path"                     # strip all other warning-related flag
+
+Diagnostics:
+  Suppress: [unused-includes]
+

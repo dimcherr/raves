@@ -1,0 +1,16 @@
+#define SOKOL_DEBUG
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#define STB_TRUETYPE_IMPLEMENTATION
+#include "stb_truetype.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include "stb_image_resize2.h"
+#define CGLTF_IMPLEMENTATION
+#include "cgltf.h"
+#define SOKOL_IMPL
+#include "sokol_app.h"
+#include "sokol_log.h"
+#include "sokol_gfx.h"
+#include "sokol_time.h"

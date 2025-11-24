@@ -33,7 +33,13 @@ sapp_desc sokol_main(int argc, char* argv[]) {
     for (auto dim : dims) {
         int png_width, png_height, num_channels;
         const int desired_channels = 4;
-        stbi_uc* ptr = stbi_load(tun::formatToString("res/textures/icon{}.png", dim).c_str(), &png_width, &png_height, &num_channels, desired_channels);
+        stbi_uc* ptr = stbi_load(
+                tun::formatToString("res/textures/icon{}.png", dim).c_str(),
+                &png_width,
+                &png_height,
+                &num_channels,
+                desired_channels
+        );
         sapp_image_desc idesc {};
         idesc.width = png_width;
         idesc.height = png_height;

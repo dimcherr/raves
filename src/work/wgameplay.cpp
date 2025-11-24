@@ -39,7 +39,7 @@ void work::UpdateDoors() {
                 }
             }
         }
-        // TODO i need to sync physics and transform properly and automatically. For now I need to modify transform and then manually update body and it's bad
+        // todo i need to sync physics and transform properly and automatically. For now I need to modify transform and then manually update body and it's bad
         float yaw = tun::Lerp(0.f, door.angle, tun::CurveAuto(opening.time));
         doorTransform.rotation = doorTransform.baseRotation * Quat({0.f, yaw, 0.f});
         tun::UpdateTransform(doorEntity);

@@ -20,10 +20,8 @@ void work::UpdateCamera() {
         gl::state.view = tun::LookAt(transform.translation + camera.offset, transform.rotation);
         gl::state.viewProj = camera.projection * gl::state.view;
         gl::state.viewPos = transform.translation + camera.offset;
-        //gl::state.frustum = tun::ExtractFrustumPlanes(camera.fovy, state.screenRatio, camera.znear, camera.zfar, gl::state.viewProj, view);
     }
 
-    // TODO update frustum only for character camera
     for (auto [characterEntity, character, camera, transform] : reg.view<CharacterComp, CameraComp, TransformComp>().each()) {
         Matrix view = tun::LookAt(transform.translation + camera.offset, transform.rotation);
         Matrix localViewProj = camera.projection * view;

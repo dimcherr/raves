@@ -67,7 +67,7 @@ void prefab::Game() {
     prefab::Button(&astring::play, {0.85f, 0.4f}, tun::white, 72.f, aevent::onPlay);
     prefab::Slider(&astring::mouseSense, {0.95f, 0.6f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.5f, 0.1f, 1.f, aevent::onUpdateMouseSense);
     prefab::Slider(&astring::soundVolume, {0.95f, 0.68f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.05f, 0.f, 1.f, aevent::onUpdateSoundVolume);
-    prefab::Slider(&astring::musicVolume, {0.95f, 0.76f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.05f, 0.f, 1.f, aevent::onUpdateMusicVolume);
+    prefab::Slider(&astring::musicVolume, {0.95f, 0.76f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.0f, 0.f, 1.f, aevent::onUpdateMusicVolume);
     prefab::Button(&astring::currentLang, {0.95f, 0.84f}, Color(0.9f, 0.9f, 0.9f), 32.f, aevent::onChangeLang);
     #endif
 

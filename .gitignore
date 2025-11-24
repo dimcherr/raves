@@ -7,6 +7,7 @@ shaders/*.h
 *.ninja
 *.log
 glb.json
+fontatlas.png
 *.blend1
 *.asd
 *.glb

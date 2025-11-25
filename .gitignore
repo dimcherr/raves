@@ -13,4 +13,4 @@ fontatlas.png
 *.glb
 .cache
 compile_commands.json
-res/
+res/sounds/

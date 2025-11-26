@@ -15,6 +15,9 @@ static void TeleportPlayerToFlyCamera();
 static void ReloadScene();
 
 void work::UpdateDebug() {
+    if (ainput::quit().started) {
+        exit(0);
+    }
     if (ainput::toggleDebugView().started) {
         ToggleDebugView();
     }

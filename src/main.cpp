@@ -16,8 +16,13 @@ sapp_desc sokol_main(int argc, char* argv[]) {
     desc.frame_cb = &game::Update;
     desc.cleanup_cb = &game::Destroy;
     desc.event_cb = &game::OnEvent;
-    desc.width = 1920;
-    desc.height = 1080;
+
+    float ratio = 1920 / 1080.f;
+    desc.width = 1517;
+    desc.height = 1517 / ratio;
+    desc.window_x = 1920 - desc.width - 8;
+    desc.window_y = 140;
+
     desc.sample_count = 0;
     desc.fullscreen = false;
     desc.window_title = "Raves";

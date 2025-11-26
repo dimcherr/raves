@@ -953,6 +953,8 @@ typedef struct {
     bool onscreen_keyboard_shown;
     int window_width;
     int window_height;
+    int window_x;
+    int window_y;
     int framebuffer_width;
     int framebuffer_height;
     int sample_count;
@@ -1223,6 +1225,8 @@ _SOKOL_PRIVATE void _sapp_init_state(const sapp_desc* desc) {
     // NOTE: _sapp.desc.width/height may be 0! Platform backends need to deal with this
     _sapp.window_width = _sapp.desc.width;
     _sapp.window_height = _sapp.desc.height;
+    _sapp.window_x = _sapp.desc.window_x;
+    _sapp.window_y = _sapp.desc.window_y;
     _sapp.framebuffer_width = _sapp.window_width;
     _sapp.framebuffer_height = _sapp.window_height;
     _sapp.sample_count = _sapp.desc.sample_count;
@@ -5783,8 +5787,8 @@ DWORD win_style = _sapp.fullscreen ? (WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDR
         L"SOKOLAPP",                // lpClassName
         _sapp.window_title_wide,    // lpWindowName
         win_style,                  // dwStyle
-        CW_USEDEFAULT,              // X
-        SW_HIDE,                    // Y (NOTE: CW_USEDEFAULT is not used for position here, but internally calls ShowWindow!
+        _sapp.window_x,              // X
+        _sapp.window_y,                    // Y (NOTE: CW_USEDEFAULT is not used for position here, but internally calls ShowWindow!
         use_default_width ? CW_USEDEFAULT : win_width, // nWidth
         use_default_height ? CW_USEDEFAULT : win_height, // nHeight (NOTE: if width is CW_USEDEFAULT, height is actually ignored)
         NULL,                       // hWndParent

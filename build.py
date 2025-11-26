@@ -38,6 +38,7 @@ sounds += tun.sounds("assets/sounds", "res/sounds")
 
 shaders += tun.shaders("shaders", platform)
 shaderLang = "glsl300es" if platform == WEB else "glsl430"
+#shaderLang = "glsl300es" if platform == WEB else "hlsl4"
 shaderCompiler = "tools/sokol-shdc.exe"
 
 units += tun.units("src")
@@ -49,9 +50,11 @@ if platform == WIN:
     strings["output"] = "{}.exe".format(strings["name"])
     strings["compiler"] = "g++"
     lists["libs"] += tun.libs("kernel32 user32 shell32 gdi32 ole32 pthread")
+    #lists["libs"] += tun.libs("kernel32 user32 shell32 gdi32 ole32 pthread d3d11 dxgi")
     lists["cflags"] += tun.flags("-Wno-stringop-overflow")
     lists["lflags"] += tun.flags("")
     lists["defines"] += tun.defines("SOKOL_GLCORE")
+    #lists["defines"] += tun.defines("SOKOL_D3D11")
     lists["includes"] += tun.includes("shaders/build/win")
 elif platform == WEB:
     strings["output"] = "{}/index.html".format(strings["name"])

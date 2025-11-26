@@ -25,6 +25,7 @@ extern Input reloadScene;
 extern Input toggleDebugView;
 extern Input toggleFPS;
 extern Input toggleFlyMode;
+extern Input quit;
 extern Input teleportPlayerToFlyCamera;
 extern Input flyForward;
 extern Input flyBack;

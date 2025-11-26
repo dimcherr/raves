@@ -23,6 +23,7 @@ TwoAxisInput look {};
 
 Input reloadScene {{SAPP_KEYCODE_F5}, {}};
 Input toggleDebugView {{SAPP_KEYCODE_U}, {}};
+Input quit {{SAPP_KEYCODE_F1}, {}};
 Input toggleFPS {{SAPP_KEYCODE_I}, {}};
 Input toggleFlyMode {{SAPP_KEYCODE_V}, {}};
 Input teleportPlayerToFlyCamera {{SAPP_KEYCODE_T}, {}};

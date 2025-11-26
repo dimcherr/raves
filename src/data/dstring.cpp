@@ -41,3 +41,4 @@ LocString clickToContinue {"(Enter) Continue", "(Enter) Продолжить"};
 LocString musicBox {"Music Box", "Шкатулка"};
 
 }
+

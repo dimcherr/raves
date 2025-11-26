@@ -24,9 +24,9 @@ Entity prefab::Grid(int segmentCount, const Color& color) {
     material.color = color;
 
     auto& transform = reg.emplace<TransformComp>(entity);
+    transform.entity = entity;
     transform.rotation = Quat(Vec(-tun::pi * 0.5f, 0.f, 0.f));
     transform.scale = Vec(scale, scale, scale);
-    tun::UpdateTransform(entity);
 
     return entity;
 }
@@ -43,8 +43,8 @@ Entity prefab::CameraFly(const Vec& position, const Vec& target) {
     camera.zfar = 1000.f;
     
     auto& transform = reg.emplace<TransformComp>(entity);
+    transform.entity = entity;
     transform.translation = position;
-    tun::UpdateTransform(entity);
 
 
     return entity;

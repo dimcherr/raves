@@ -27,6 +27,7 @@ void work::LoadScene() {
         {"PlatformStart", prefab::PlatformStart},
         {"PlatformEnd", prefab::PlatformEnd},
         {"MusicBox", prefab::MusicBoxPart},
+        {"Switch", prefab::Switch},
 
         {"SpawnAnimation", prefab::SpawnPointAnimation},
         {"Door", prefab::Door},
@@ -135,12 +136,17 @@ void work::LoadScene() {
             reg.emplace<SkinnedModelComp>(node->entity);
         }
         auto& transformComp = reg.emplace<TransformComp>(node->entity);
+        transformComp.entity = node->entity;
         reg.emplace<GLTFTag>(node->entity);
         transformComp.translation = node->translation;
         transformComp.rotation = node->rotation;
         transformComp.baseRotation = node->rotation;
         transformComp.scale = node->scale;
-        transformComp.Update();
+        transformComp.dirty = true;
+        if (node->parent) {
+            tun::log("SET PARENT!!");
+            transformComp.parent = Thing<TransformComp>(node->parent->entity);
+        }
         if (node->model) {
             auto& modelComp = reg.emplace<ModelComp>(node->entity);
             modelComp.name = node->name;

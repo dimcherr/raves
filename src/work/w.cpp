@@ -45,15 +45,6 @@ void work::UpdateGame() {
                 camera.yaw -= tun::pi * 2.f;
             }
             camera.pitch = 0.f;
-            //transform.rotation = transform.baseRotation * Quat({0.f, state.deltaTime, 0.f});
-            //tun::UpdateTransform(characterEntity);
-            //auto& bodyInterface = phys::state->physicsSystem.GetBodyInterface();
-            //bodyInterface.SetPositionAndRotation(
-                //body.id,
-                //Convert(transform.translation),
-                //Convert(transform.rotation),
-                //JPH::EActivation::Activate
-            //);
         }
     }
 }
@@ -71,8 +62,8 @@ static void UpdateMusicBox() {
             } else if (part.type == MusicBoxPartComp::statue) {
                 transform.rotation *= Quat({0.f, glm::fract(musicBox.windingPercent) * tun::pi * 2.f, 0.f});
             }
+            transform.dirty = true;
 
-            tun::UpdateTransform(entity);
             auto& bodyInterface = phys::state->physicsSystem.GetBodyInterface();
             bodyInterface.SetPositionAndRotation(
                 body.id,
@@ -317,13 +308,13 @@ static void UpdatePlayer() {
 static void UpdatePlatforms() {
     for (auto [characterEntity, character] : reg.view<CharacterComp>().each()) {
         for (auto [entity, platform, transform, body, model] : reg.view<PlatformComp, TransformComp, BodyComp, ModelComp>().each()) {
-            if (platform.musicBoxType == MusicBoxComp::blue) {
-                model.tint = tun::blue;
-            } else if (platform.musicBoxType == MusicBoxComp::green) {
-                model.tint = tun::green;
-            } else if (platform.musicBoxType == MusicBoxComp::red) {
-                model.tint = tun::red;
-            }
+            //if (platform.musicBoxType == MusicBoxComp::blue) {
+                //model.tint = tun::blue;
+            //} else if (platform.musicBoxType == MusicBoxComp::green) {
+                //model.tint = tun::green;
+            //} else if (platform.musicBoxType == MusicBoxComp::red) {
+                //model.tint = tun::red;
+            //}
 
             Vec prevTranslation = transform.translation;
             Quat prevRotation = transform.rotation;
@@ -331,6 +322,21 @@ static void UpdatePlatforms() {
             // Update transform based on lerp
             auto& endTransform = reg.get<TransformComp>(platform.end);
 
+            if (platform.isGreen) {
+                model.tint = tun::green;
+                if (greenSwitch.value > 0.5f) {
+                    float period = tun::pi * 2.f;
+                    platform.linearTime += state.deltaTime * platform.speed * 15.f;
+                    if (platform.linearTime > period) {
+                        platform.linearTime -= period;
+                    } else if (platform.linearTime < 0.f) {
+                        platform.linearTime += period;
+                    }
+                    platform.time = (glm::sin(platform.linearTime) + 1.f) / 2.f; // from 0 to 1
+                }
+            }
+
+#if 0 
             if (platform.musicBoxType == MusicBoxComp::red) {
                 platform.time = platform.winding + platform.offset;
                 if (platform.time > 1.f) {
@@ -362,29 +368,20 @@ static void UpdatePlatforms() {
                     platform.time = 2.f - platform.linearTime;
                 }
             }
+#endif
 
             float rawTime = glm::clamp(platform.time, 0.f, 1.f);
             float t = tun::CurveAuto(rawTime);
             transform.translation = tun::Lerp(platform.startTranslation, endTransform.translation, t);
             transform.rotation = tun::Lerp(platform.startRotation, endTransform.rotation, t);
-            tun::UpdateTransform(entity);
+            transform.dirty = true;
 
-            // Calculate velocities
             Vec linearVelocity = (transform.translation - prevTranslation) / state.deltaTime;
             Quat deltaRotation = transform.rotation * glm::inverse(prevRotation);
             Vec angularVelocity = glm::axis(deltaRotation) * glm::angle(deltaRotation) / state.deltaTime;
 
             auto& bodyInterface = phys::state->physicsSystem.GetBodyInterface();
 
-            // Set position to ensure no drift (optional, for precision)
-            //bodyInterface.SetPositionAndRotation(
-                //body.id,
-                //Convert(transform.translation),
-                //Convert(transform.rotation),
-                //JPH::EActivation::Activate
-            //);
-
-            // Set velocities for the kinematic body
             bodyInterface.SetLinearVelocity(body.id, Convert(linearVelocity));
             bodyInterface.SetAngularVelocity(body.id, Convert(angularVelocity));
         }
@@ -408,16 +405,12 @@ static void UpdateDoors() {
         // TODO i need to sync physics and transform properly and automatically. For now I need to modify transform and then manually update body and it's bad
         float yaw = tun::Lerp(0.f, door.angle, tun::CurveAuto(opening.time));
         doorTransform.rotation = doorTransform.baseRotation * Quat({0.f, yaw, 0.f});
-        tun::UpdateTransform(doorEntity);
+        doorTransform.dirty = true;
         phys::state->physicsSystem.GetBodyInterface().SetRotation(doorBody.id, Convert(doorTransform.rotation), JPH::EActivation::Activate);
     }
 }
 
 static void UpdateSubtitles() {
-    if (state.gameTime > 1.5f && !acue::firstRoom().played) {
-        work::PlaySubtitle(acue::firstRoom);
-    }
-
     if (ainput::skipSub().started) {
         if (reg.valid(state.currentSubtitle)) {
             auto& sub = reg.get<SubtitleComp>(state.currentSubtitle);
@@ -428,9 +421,9 @@ static void UpdateSubtitles() {
                 } else if (subtitleShowing.time == 1.f) {
                     sub.active = false;
                     state.currentSubtitle = entt::null;
-                    if (reg.valid(sub.nextSubtitle)) {
-                        work::PlaySubtitle(sub.nextSubtitle);
-                    }
+                    //if (reg.valid(sub.nextSubtitle)) {
+                        //work::PlaySubtitle(sub.nextSubtitle);
+                    //}
                     if (auto* onSkip = sub.onSkip.Maybe()) {
                         onSkip->Start();
                     }
@@ -456,9 +449,9 @@ static void UpdateSubtitles() {
             }
             subtitle.onPlayed().Start();
             if (reg.valid(subtitle.nextSubtitle)) {
-                if (!subtitle.skippable) {
-                    work::PlaySubtitle(subtitle.nextSubtitle);
-                }
+                //if (!subtitle.skippable) {
+                    //work::PlaySubtitle(subtitle.nextSubtitle);
+                //}
             } else {
                 if (!subtitle.skippable) {
                     subtitle.active = false;

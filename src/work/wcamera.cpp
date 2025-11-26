@@ -15,7 +15,7 @@ void work::UpdateCamera() {
     for (auto [cameraEntity, camera, transform] : reg.view<tag::Current, CameraComp, TransformComp>().each()) {
         tun::UpdateCamera(camera, state.screenWidth, state.screenHeight);
         transform.rotation = Quat({camera.pitch, camera.yaw, 0.f});
-        tun::UpdateTransform(cameraEntity);
+        transform.dirty = true;
 
         gl::state.view = tun::LookAt(transform.translation + camera.offset, transform.rotation);
         gl::state.viewProj = camera.projection * gl::state.view;

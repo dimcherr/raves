@@ -190,7 +190,7 @@ void work::UpdatePhysics() {
             );
 
             transform.translation = Convert(character.character->GetPosition());
-            tun::UpdateTransform(characterEntity);
+            transform.dirty = true;
         }
     }
 
@@ -271,7 +271,7 @@ void work::UpdatePhysics() {
             bodyInterface.GetPositionAndRotation(body.id, pos, rot);
             transform.translation = Convert(pos);
             transform.rotation = Convert(rot);
-            tun::UpdateTransform(entity);
+            transform.dirty = true;
         }
     });
 
@@ -298,7 +298,7 @@ void work::UpdatePhysics() {
             bodyInterface.GetPositionAndRotation(body.id, pos, rot);
             transform.translation = Convert(pos);
             transform.rotation = Convert(rot);
-            transform.Update();
+            transform.dirty = true;
         }
     });
 

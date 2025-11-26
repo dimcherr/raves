@@ -23,7 +23,7 @@ try:
         export_apply=True,
         export_materials='EXPORT',
         export_yup=True,
-        export_hierarchy_flatten_objs=True
+        export_hierarchy_flatten_objs=False
     )
 
     sys.exit(0)

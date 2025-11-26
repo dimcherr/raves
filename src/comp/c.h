@@ -29,6 +29,11 @@ struct MusicBoxComp {
     float rotatingDelta {0.f};
 };
 
+struct SwitchComp {
+    String type {};
+    Thing<InteractableComp> interactable {};
+};
+
 struct MusicBoxPartComp {
     enum Type {
         crank,
@@ -61,6 +66,10 @@ struct PlatformComp {
     Vec startTranslation {tun::vecZero};
     Quat startRotation {tun::quatIdentity};
     MusicBoxComp::Type musicBoxType {MusicBoxComp::Type::green};
+
+    bool isGreen {}; 
+    bool isYellow {}; 
+    bool isPurple {}; 
 };
 
 struct PlatformEndComp {};

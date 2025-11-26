@@ -15,6 +15,30 @@
 #include "data/dsound.h"
 
 void work::UpdateInteract() {
+    greenSwitch.update();
+    yellowSwitch.update();
+    purpleSwitch.update();
+
+    for (auto [switchEntity, switchComp, modelComp, transformComp, bodyComp] : reg.view<SwitchComp, ModelComp, TransformComp, BodyComp>().each()) {
+        float val = 0.f;
+        if (switchComp.type == "Green") {
+            modelComp.tint = tun::green;
+            val = greenSwitch.value;
+        } else if (switchComp.type == "Yellow") {
+            modelComp.tint = tun::yellow;
+            val = yellowSwitch.value;
+        } else if (switchComp.type == "Purple") {
+            modelComp.tint = tun::purple;
+            val = purpleSwitch.value;
+        }
+
+        float pitch = tun::Lerp(0.f, tun::pi * 0.5f, tun::CurveAuto(val));
+        transformComp.rotation = transformComp.baseRotation * Quat({pitch, 0.f, 0.f});
+        transformComp.dirty = true;
+        //tun::log("transform rotation {} world {}", transformComp.rotation, transformComp.worldRotation);
+        phys::state->physicsSystem.GetBodyInterface().SetRotation(bodyComp.id, Convert(transformComp.worldRotation), JPH::EActivation::Activate);
+    }
+
     for (auto [itemEntity, inventoryItem] : reg.view<InventoryItemComp>().each()) {
         if (inventoryItem.inInventory().onEnd().started) {
             asound::pickUp().Play();
@@ -45,84 +69,25 @@ void work::UpdateInteract() {
             if (auto* interactable = reg.try_get<InteractableComp>(character.interactable)) {
                 text.text = &astring::pick;
                 material.opacity = tun::CurveAuto(interactable->onHover().time);
-                if (auto* inventoryItem = reg.try_get<InventoryItemComp>(interactable->parentBody)) {
-                    inventoryItem->scaleAnim = tun::Lerp(0.95f, 1.05f, tun::CurveAuto(character.interactPulsing().time));
+                if (auto* switchComp = reg.try_get<SwitchComp>(interactable->parentBody)) {
                     if (ainput::interact().started && character.timeSinceInteract > 0.15f) {
-                        character.interactable = entt::null;
-                        character.timeSinceInteract = 0.f;
-                        auto& localInventory = reg.get<InventoryComp>(inventoryItem->inventory);
-                        localInventory.items.push_back(interactable->parentBody);
-                        inventoryItem->index = localInventory.items.size() - 1;
-                        inventoryItem->inInventory().time = 0.f;    
-                        inventoryItem->inInventory().delta = 1.f;
-                        auto& model = reg.get<ModelComp>(interactable->parentBody);
-                        model.active = false;
-                        interactable->active = false;
+                        SwitchState* ss {};
+                        if (switchComp->type == "Green") {
+                            ss = &greenSwitch;
+                        } else if (switchComp->type == "Yellow") {
+                            ss = &yellowSwitch;
+                        } else if (switchComp->type == "Purple") {
+                            ss = &purpleSwitch;
+                        }
 
-                        // TODO check if there is completed set
-                        struct PartData {
-                            MusicBoxComp::Type type {MusicBoxComp::Type::green};
-                            int count {0};
-                        };
-                        List<PartData> partDataList {{MusicBoxComp::green}, {MusicBoxComp::red}, {MusicBoxComp::blue}};
+                        tun::log("switch type {}", switchComp->type);
 
-                        for (auto& data : partDataList) {
-                            for (Entity itemEntity : localInventory.items) {
-                                auto& itemPart = reg.get<MusicBoxPartComp>(itemEntity);
-                                if (itemPart.musicBoxType == data.type) {
-                                    ++data.count;
-                                }
-                            }
-
-                            if (data.count >= 3) {
-                                // TODO sound of completion
-                                asound::completeMusicBox().Play();
-
-                                Entity musicBoxEntity {entt::null};
-                                for (Entity itemEntity : localInventory.items) {
-                                    auto& itemPart = reg.get<MusicBoxPartComp>(itemEntity);
-                                    if (itemPart.musicBoxType == data.type) {
-                                        musicBoxEntity = itemPart.musicBox;
-                                        break;
-                                    }
-                                }
-                                auto& musicBox = reg.get<MusicBoxComp>(musicBoxEntity);
-                                inventory.items.push_back(musicBox.base);
-
-                                auto& baseItem = reg.get<InventoryItemComp>(musicBox.base);
-                                auto& basePart = reg.get<MusicBoxPartComp>(musicBox.base);
-                                baseItem.index = inventory.items.size() - 1;
-                                baseItem.inventory = characterEntity;
-                                baseItem.inInventory().time = 1.f;    
-                                baseItem.inInventory().delta = 0.f;
-                                basePart.completed = true;
-
-                                auto& crankItem = reg.get<InventoryItemComp>(musicBox.crank);
-                                auto& crankPart = reg.get<MusicBoxPartComp>(musicBox.crank);
-                                crankItem.index = inventory.items.size() - 1;
-                                crankItem.inventory = characterEntity;
-                                crankItem.inInventory().time = 1.f;    
-                                crankItem.inInventory().delta = 0.f;
-                                crankPart.completed = true;
-
-                                auto& statueItem = reg.get<InventoryItemComp>(musicBox.statue);
-                                auto& statuePart = reg.get<MusicBoxPartComp>(musicBox.statue);
-                                statueItem.index = inventory.items.size() - 1;
-                                statueItem.inventory = characterEntity;
-                                statueItem.inInventory().time = 1.f;    
-                                statueItem.inInventory().delta = 0.f;
-                                statuePart.completed = true;
-
-                                for (auto it = localInventory.items.begin(); it != localInventory.items.end();) {
-                                    if (*it == musicBox.base || *it == musicBox.crank || *it == musicBox.statue) {
-                                        it = localInventory.items.erase(it);
-                                    } else {
-                                        ++it;
-                                    }
-                                }
-                                for (int j = 0; j < localInventory.items.size(); ++j) {
-                                    reg.get<InventoryItemComp>(localInventory.items[j]).index = j;
-                                }
+                        if (ss) {
+                            tun::log("FOUND SS");
+                            if (ss->value > 0.5f) {
+                                ss->delta = -1.f;
+                            } else {
+                                ss->delta = 1.f;
                             }
                         }
                     }
@@ -148,7 +113,7 @@ void work::UpdateInteract() {
                 weaponTransform->translation.x = tun::Lerp(weaponTransform->translation.x, targetPos.x, alpha);
                 weaponTransform->translation.y = tun::Lerp(weaponTransform->translation.y, targetPos.y, alpha);
                 weaponTransform->translation.z = tun::Lerp(weaponTransform->translation.z, targetPos.z, alpha);
-                tun::UpdateTransform(weapon->weaponModel);
+                weaponTransform->dirty = true;
                 auto& weaponBody = reg.get<BodyComp>(weapon->weaponModel);
                 auto& weaponModel = reg.get<ModelComp>(weapon->weaponModel);
                 weaponModel.active = false;

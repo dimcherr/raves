@@ -107,7 +107,7 @@ void work::DrawGrid() {
     for (auto [entity, mesh, material] : reg.view<const MeshComp, const MaterialGridComp>().each()) {
         auto& transform = reg.get<TransformComp>(mesh.model);
 
-        pip.vs.mvp = gl::state.viewProj * transform.transform;
+        pip.vs.mvp = gl::state.viewProj * transform.worldTransform;
         pip.fs.segmentCount = material.segmentCount;
         pip.fs.color = material.color;
 
@@ -120,7 +120,7 @@ void work::DrawLights() {
     pip.Use();
     
     reg.view<PointLightComp, MaterialColorComp, TransformComp>().each([](const PointLightComp& light, const MaterialColorComp& material, const TransformComp& transform) {
-        pip.vs.mvp = gl::state.viewProj * transform.transform;
+        pip.vs.mvp = gl::state.viewProj * transform.worldTransform;
         pip.fs.color = Vec4(material.color, 1.f);
 
         pip.Draw(aprim::plane().drawData);
@@ -252,7 +252,7 @@ void work::DrawGColor() {
                         }
 
                         float alpha = tun::CurveAuto(reg.get<TweenComp>(inventoryItem->inInventory).time);
-                        Matrix scaledT = glm::scale(transform.transform, Vec(inventoryItem->scaleAnim));
+                        Matrix scaledT = glm::scale(transform.worldTransform, Vec(inventoryItem->scaleAnim));
                         Matrix m = tun::Lerp(scaledT, t * r * rr * s, alpha);
 
                         pip.vs.mvp = tun::Lerp(gl::state.viewProj * scaledT, ss * tt * rr * s, alpha);
@@ -262,9 +262,9 @@ void work::DrawGColor() {
                 }
             }
         } else {
-            pip.vs.mvp = gl::state.viewProj * transform.transform;
-            pip.vs.matModel = transform.transform;
-            pip.vs.matNormal = glm::transpose(glm::inverse(transform.transform));
+            pip.vs.mvp = gl::state.viewProj * transform.worldTransform;
+            pip.vs.matModel = transform.worldTransform;
+            pip.vs.matNormal = glm::transpose(glm::inverse(transform.worldTransform));
         }
 
         if (material.tintable) {
@@ -301,7 +301,7 @@ void work::DrawBoundingBoxes() {
     reg.view<ModelComp, TransformComp, BoxShapeComp>().each([](ModelComp& model, TransformComp& transform, BoxShapeComp& boxShapeComp) {
         pip.fs.segmentCount = (int)glm::round(1.f / 0.2f);
 
-        auto boundingBox = tun::TransformAABB(transform.transform, boxShapeComp.boundingBox, boxShapeComp.offset, boxShapeComp.size);
+        auto boundingBox = tun::TransformAABB(transform.worldTransform, boxShapeComp.boundingBox, boxShapeComp.offset, boxShapeComp.size);
         Vec bbMax = boxShapeComp.transformedBoundingBox.max;
         Matrix t = glm::translate({1.f}, bbMax);
         Matrix s = glm::scale({1.f}, Vec{0.1f, 0.1f, 0.1f});

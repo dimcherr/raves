@@ -27,8 +27,6 @@ Entity prefab::StaticBody(const gltf::ModelParams& params) {
     body.motionType = JPH::EMotionType::Static;
     body.layer = phys::Layers::nonMoving;
 
-    tun::UpdateTransform(params.entity);
-
     return params.entity;
 }
 
@@ -41,8 +39,6 @@ Entity prefab::KinematicBody(const gltf::ModelParams& params) {
     BodyComp& body = reg.emplace<BodyComp>(params.entity);
     body.motionType = JPH::EMotionType::Kinematic;
     body.layer = phys::Layers::moving;
-
-    tun::UpdateTransform(params.entity);
 
     return params.entity;
 }
@@ -59,8 +55,6 @@ Entity prefab::DecorBody(const gltf::ModelParams& params) {
         body.layer = phys::Layers::invisible;
     }
 
-    tun::UpdateTransform(params.entity);
-
     return params.entity;
 }
 
@@ -76,8 +70,6 @@ Entity prefab::PickableBody(const gltf::ModelParams& params) {
         body.layer = phys::Layers::obstacle;
     }
 
-    tun::UpdateTransform(params.entity);
-
     return params.entity;
 }
 
@@ -89,8 +81,6 @@ Entity prefab::LightBody(const gltf::ModelParams& params) {
     BodyComp& body = reg.emplace<BodyComp>(params.entity);
     body.motionType = JPH::EMotionType::Static;
     body.layer = phys::Layers::invisible;
-
-    tun::UpdateTransform(params.entity);
 
     return params.entity;
 }
@@ -114,8 +104,6 @@ Entity prefab::Dynamic(Entity entity, Entity modelAsset) {
     body.motionType = JPH::EMotionType::Dynamic;
     body.layer = phys::Layers::moving;
 
-    tun::UpdateTransform(entity);
-
     return entity;
 }
 
@@ -124,8 +112,6 @@ Entity prefab::Collision(const gltf::ModelParams& params) {
 
     auto& model = reg.get<ModelComp>(params.entity);
     model.visible = false;
-
-    tun::UpdateTransform(params.entity);
 
     return params.entity;
 }
@@ -186,9 +172,9 @@ Entity prefab::Character() {
     camera.pitch = 0.f;
 
     auto& transform = reg.emplace<TransformComp>(entity);
+    transform.entity = entity;
     for (auto [spawnPointEntity, spawnPointTransform] : reg.view<SpawnPointCharacterComp, TransformComp>().each()) {
         transform.translation = spawnPointTransform.translation;
-        tun::UpdateTransform(entity);
         break;
     }
 
@@ -202,15 +188,7 @@ Entity prefab::Character() {
     auto& jump = reg.emplace<JumpComp>(entity);
     jump.strength = 8.f;
 
-    //auto& doubleJump = reg.emplace<DoubleJumpComp>(entity);
-    //doubleJump.strength = 1.f;
-
-    //auto& crouch = reg.emplace<CrouchComp>(entity);
-    //crouch.speed = 1.f;
-
     auto& inventory = reg.emplace<InventoryComp>(entity);
-
-    tun::UpdateTransform(entity);
 
     return entity;
 }
@@ -229,8 +207,6 @@ Entity prefab::LightVolume(const gltf::ModelParams& params) {
     // TODO fix this using params
     lightVolume.index = -1;
     lightVolume.master = true;
-
-    tun::UpdateTransform(params.entity);
 
     return params.entity;
 }
@@ -255,8 +231,8 @@ Entity prefab::JohnDoe(const Vec3& position, StringView objectName, StringView a
 
     Entity entity = reg.create();
     auto& transform = reg.emplace<TransformComp>(entity);
+    transform.entity = entity;
     transform.translation = position;
-    tun::UpdateTransform(entity);
 
     BoxShapeComp& assetBoxShape = reg.get<BoxShapeComp>(originalModel.modelAsset);
     BoxShapeComp& boxShape = reg.emplace<BoxShapeComp>(entity);
@@ -307,10 +283,6 @@ Entity prefab::JohnDoe(const Vec3& position, StringView objectName, StringView a
     imgDesc.pixel_format = SG_PIXELFORMAT_RGBA32F;
     imgDesc.usage = SG_USAGE_STREAM;
     skeletonComp.jointTexture = sg_make_image(imgDesc);
-
-    tun::log("SPWNED JOHN DOE {}", modelName);
-
-    tun::UpdateTransform(entity);
 
     return entity;
 }

@@ -10,6 +10,7 @@
 #include "asset/astring.h"
 
 void work::UpdateState() {
+
     state.deltaTime = sapp_frame_duration();
     state.time += state.deltaTime;
     if (!state.paused) {
@@ -64,6 +65,10 @@ void work::UpdateState() {
         int nextLang = ((int)lang::current + 1) % 2;
         lang::current = (lang::Lang)nextLang;
         aevent::onUpdateLang().Start();
+    }
+
+    for (auto [entity, transform] : reg.view<TransformComp>().each()) {
+        transform.Update();
     }
 }
 

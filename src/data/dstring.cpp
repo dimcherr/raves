@@ -20,7 +20,7 @@ LocString mouseSense {"Mouse sensitivity", "Чувствительность м�
 LocString soundVolume {"Sound volume", "Громкость звуков"};
 LocString musicVolume {"Music volume", "Громкость музыки"};
 
-LocString pick {"(E) Take", "(E) Взять"};
+LocString pick {"(E) Use", "(E) Переключить"};
 LocString open {"[E] Open", "[E] Открыть"};
 LocString unlock {"[E] Open", "[E] Открыть"};
 LocString drop {"[E] Drop", "[E] Бросить"};

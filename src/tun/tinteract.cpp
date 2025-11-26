@@ -15,13 +15,12 @@ Thing<InteractableComp> tun::CreateInteractable(Entity parentEntity, const Vec& 
 
     SphereShapeComp& shapeComp = reg.emplace<SphereShapeComp>(interactable.entity, radius);
     TransformComp& transform = reg.emplace<TransformComp>(interactable.entity);
+    transform.entity = interactable.entity;
     transform.translation = position;
 
     BodyComp& body = reg.emplace<BodyComp>(interactable.entity);
     body.motionType = JPH::EMotionType::Static;
     body.layer = phys::Layers::interactable;
-
-    tun::UpdateTransform(interactable.entity);
 
     return interactable;
 }

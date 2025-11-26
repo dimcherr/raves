@@ -23,14 +23,3 @@ Thing<EventComp> tun::CreateEvent(bool ongoing) {
     return event;
 }
 
-void tun::UpdateTransform(Entity entity) {
-    if (auto* transform = reg.try_get<TransformComp>(entity)) {
-        Matrix t = glm::translate({1.f}, transform->translation);
-        Matrix r = glm::mat4_cast(transform->rotation);
-        Matrix s = glm::scale({1.f}, transform->scale);
-        transform->transform = t * r * s;
-        if (auto* boxShape = reg.try_get<BoxShapeComp>(entity)) {
-            boxShape->transformedBoundingBox = tun::TransformAABB(transform->transform, boxShape->boundingBox, boxShape->offset, boxShape->size);
-        }
-    }
-}

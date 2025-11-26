@@ -179,6 +179,10 @@ Entity prefab::PlatformStart(const gltf::ModelParams& params) {
         platformComp.musicBoxType = MusicBoxComp::green;
     }
 
+    platformComp.isGreen = params.GetFloatParam("IsGreen");
+    platformComp.isYellow = params.GetFloatParam("IsYellow");
+    platformComp.isPurple = params.GetFloatParam("IsPurple");
+
     return entity;
 }
 
@@ -213,6 +217,15 @@ Entity prefab::MusicBox(MusicBoxComp::Type type) {
 
     return entity;
 }
+
+Entity prefab::Switch(const gltf::ModelParams& params) {
+    Entity entity = prefab::PickableBody(params);
+    auto& model = reg.get<ModelComp>(params.entity);
+    auto& switchComp = reg.emplace<SwitchComp>(entity);
+    switchComp.interactable = tun::CreateInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);
+    switchComp.type = params.GetStringParam("Type");
+    return entity;
+} 
 
 Entity prefab::MusicBoxPart(const gltf::ModelParams& params) {
     Entity entity = prefab::PickableBody(params);
@@ -266,7 +279,7 @@ Entity prefab::Skybox() {
 Entity prefab::Checkpoint(const gltf::ModelParams& params) {
     auto& checkpoint = reg.emplace<CheckpointComp>(params.entity);
     checkpoint.index = (int)params.GetFloatParam("Index");
-    tun::UpdateTransform(params.entity);
+    reg.get<TransformComp>(params.entity).dirty = true;
     return params.entity;
 }
 
@@ -283,7 +296,7 @@ Entity prefab::CheckpointVolume(const gltf::ModelParams& params) {
     auto& checkpointVolume = reg.emplace<CheckpointVolumeComp>(params.entity);
     checkpointVolume.checkpointName = params.GetStringParam("Checkpoint");
 
-    tun::UpdateTransform(params.entity);
+    reg.get<TransformComp>(params.entity).dirty = true;
 
     return params.entity;
 }

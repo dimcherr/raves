@@ -44,3 +44,15 @@ struct State {
 
 inline State state {};
 inline entt::registry reg {};
+
+struct SwitchState {
+    float value {};
+    float delta {};
+
+    void update();
+};
+
+inline SwitchState greenSwitch {};
+inline SwitchState yellowSwitch {};
+inline SwitchState purpleSwitch {};
+

@@ -166,6 +166,7 @@ inline constexpr Color white {1.f, 1.f, 1.f};
 inline constexpr Color black {0.f, 0.f, 0.f};
 inline constexpr Color pink {1.f, 0.5f, 0.5f};
 inline constexpr Color yellow {1.f, 1.0f, 0.f};
+inline constexpr Color purple {1.f, 0.0f, 1.f};
 inline constexpr Color orange {1.f, 0.5f, 0.f};
 inline constexpr Color gold {1.f, 0.84f, 0.f};
 

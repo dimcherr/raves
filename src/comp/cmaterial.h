@@ -1,12 +1,13 @@
 #pragma once
 #include "tun/tmath.h"
+#include "tun/tcolor.h"
 #include "comp/canim.h"
 
 struct SingularityMaterialComp {
     Matrix mvp {1.f};
     float time {};
     float ratio {1.f};
-    Color tint {tun::white};
+    Color tint {tcolor::white};
     float opacity {1.f};
 };
 
@@ -37,6 +38,6 @@ struct TurbulenceMaterialComp {
 
 struct TextMaterialComp {
     Matrix mvp {1.f};
-    Color tint {tun::white};
+    Color tint {tcolor::white};
     float opacity {1.f};
 };

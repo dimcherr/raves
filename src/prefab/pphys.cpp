@@ -2,7 +2,6 @@
 #include "comp/canim.h"
 #include "comp/cinteract.h"
 #include "data/dsound.h"
-#include "state.h"
 #include "tags.h"
 #include "comp/cphys.h"
 #include "comp/crender.h"
@@ -209,82 +208,6 @@ Entity prefab::LightVolume(const gltf::ModelParams& params) {
     lightVolume.master = true;
 
     return params.entity;
-}
-
-Entity prefab::JohnDoe(const Vec3& position, StringView objectName, StringView animationName) {
-    String modelName {objectName};
-
-    Entity assetEntity {entt::null};
-    for (auto [e, modelComp] : reg.view<SkinnedModelComp, ModelComp>().each()) {
-        if (modelComp.name == modelName) {
-            assetEntity = e;
-            break;
-        }
-    }
-    if (!reg.valid(assetEntity)) {
-        tun::log("CANNOT FIND SKELETON FOR {}", modelName);
-    }
-
-    auto& originalModel = reg.get<ModelComp>(assetEntity);
-    originalModel.active = false;
-    originalModel.visible = false;
-
-    Entity entity = reg.create();
-    auto& transform = reg.emplace<TransformComp>(entity);
-    transform.entity = entity;
-    transform.translation = position;
-
-    BoxShapeComp& assetBoxShape = reg.get<BoxShapeComp>(originalModel.modelAsset);
-    BoxShapeComp& boxShape = reg.emplace<BoxShapeComp>(entity);
-    boxShape = assetBoxShape;
-    BodyComp& body = reg.emplace<BodyComp>(entity);
-    body.motionType = JPH::EMotionType::Static;
-    body.layer = phys::Layers::nonMoving;
-    ModelComp& modelComp = reg.emplace<ModelComp>(entity);
-    modelComp = originalModel;
-    modelComp.visible = true;
-    modelComp.active = true;
-    for (auto [e, originalMeshComp] : reg.view<SkinnedModelComp, MeshComp>().each()) {
-        if (reg.get<ModelComp>(originalMeshComp.model).name == modelName) {
-            Entity meshEntity = reg.create();
-            MeshComp& meshComp = reg.emplace<MeshComp>(meshEntity);
-            meshComp = originalMeshComp;
-            meshComp.model = entity;
-            const auto& parentMaterial = reg.get<MaterialPBRComp>(reg.get<MeshAssetComp>(originalMeshComp.asset).material);
-            auto& childMaterial = reg.emplace<MaterialPBRComp>(meshEntity, parentMaterial);
-            childMaterial.skinned = true;
-        }
-    }
-
-    SkeletonComp& skeletonComp = reg.emplace<SkeletonComp>(entity);
-    for (auto [se, skeletonAssetComp] : reg.view<SkeletonAssetComp>().each()) {
-        tun::log("skel asset name {} vs orig model name {}", skeletonAssetComp.name, originalModel.name);
-        if (skeletonAssetComp.name == originalModel.name) {
-            skeletonComp.asset = se;
-            break;
-        }
-    }
-
-
-    auto& skel = reg.get<SkeletonAssetComp>(skeletonComp.asset).skeleton;
-    int animCounter = 0;
-    for (auto& anim : skel.animations) {
-        if (anim.name() == tun::formatToString("{}{}", objectName, animationName)) {
-            break;
-        }
-        animCounter++;
-    }
-    skeletonComp.animationIndex = animCounter;
-
-    sg_image_desc imgDesc {};
-    imgDesc.width = anim::maxJoints * 3;
-    imgDesc.height = anim::maxInstances;
-    imgDesc.num_mipmaps = 1;
-    imgDesc.pixel_format = SG_PIXELFORMAT_RGBA32F;
-    imgDesc.usage = SG_USAGE_STREAM;
-    skeletonComp.jointTexture = sg_make_image(imgDesc);
-
-    return entity;
 }
 
 Entity prefab::Surface(const gltf::ModelParams& params) {

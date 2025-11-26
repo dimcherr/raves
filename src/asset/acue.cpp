@@ -22,25 +22,25 @@ Subtitle::Subtitle(const List<StringView>& strings, bool skippable, Speaker spea
 }
 
 void CreateCues() {
-    tun::logpush();
+    tlogpush();
 
     for (auto* cue : cues) {
         for (int i = 0; i < cue->subtitles.size(); ++i) {
-            cue->subtitles[i].entity = prefab::Subtitle(cue->subtitles[i].text, cue->subtitles[i].skippable, (int)cue->subtitles[i].speaker, cue->subtitles[i].eventOnSkip ? cue->subtitles[i].eventOnSkip->entity : entt::null, cue->subtitles[i].nextSubtitle, cue->subtitles[i].time);
+            cue->subtitles[i].entity = prefab::Subtitle(cue->subtitles[i].text, cue->subtitles[i].skippable, (int)cue->subtitles[i].speaker, cue->subtitles[i].eventOnSkip ? cue->subtitles[i].eventOnSkip->entity : Entity(), cue->subtitles[i].nextSubtitle, cue->subtitles[i].time);
         }
 
         for (int i = 0; i < cue->subtitles.size(); ++i) {
             if (i < cue->subtitles.size() - 1) {
-                reg.get<SubtitleComp>(cue->subtitles[i]).nextSubtitle = cue->subtitles[i + 1];
+                reg.get<SubtitleComp>(cue->subtitles[i].entity).nextSubtitle = cue->subtitles[i + 1];
             }
             if (i > 0) {
-                reg.get<SubtitleComp>(cue->subtitles[i]).prevSubtitle = cue->subtitles[i - 1];
+                reg.get<SubtitleComp>(cue->subtitles[i].entity).prevSubtitle = cue->subtitles[i - 1];
             }
         }
         cue->entity = cue->subtitles[0];
     }
 
-    tun::logpop("cues create");
+    tlogpop("cues create");
 }
 
 

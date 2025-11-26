@@ -14,7 +14,7 @@ Entity Slider(astring::LocString* text, Vec2 pos2D, Color color, float fontSize,
 Entity FpsView(Vec2 pos2D, Color color, float fontSize);
 Entity Tooltip(Vec2 pos2D);
 Entity SkipTooltip(Vec2 pos2D);
-Entity Subtitle(astring::LocString* text, bool skippable = false, int speaker = 0, Entity eventOnSkip = entt::null, Entity nextSubtitle = entt::null, float time = 0.2f);
+Entity Subtitle(astring::LocString* text, bool skippable = false, int speaker = 0, Entity eventOnSkip = {}, Entity nextSubtitle = {}, float time = 0.2f);
 
 Entity TextBuffer(Vec offset, Color color, float opacity);
 

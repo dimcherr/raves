@@ -5,7 +5,7 @@
 #include "sokol_log.h"
 
 void gl::Init() {
-    tun::logpush();
+    tlogpush();
 
     sg_desc desc {};
     sg_environment env {};
@@ -135,37 +135,37 @@ void gl::Init() {
     gl::state.textOffscreenPass.action.colors[0].load_action = SG_LOADACTION_CLEAR;
     gl::state.textOffscreenPass.action.colors[0].clear_value = {0.f, 0.f, 0.f, 0.f};
 
-    tun::logpop("gl init");
+    tlogpop("gl init");
 }
 
-gl::Buffer gl::CreateVertexBuffer(const List<float>& vertices) {
+sg_buffer gl::CreateVertexBuffer(const List<float>& vertices) {
     sg_buffer_desc desc {};
     desc.data = sg_range { vertices.data(), vertices.size() * sizeof(float) };
     return sg_make_buffer(desc);
 }
 
-gl::Buffer gl::CreateVertexBufferTextParticle() {
+sg_buffer gl::CreateVertexBufferTextParticle() {
     sg_buffer_desc desc {};
     desc.size = gl::State::maxTextCharacters * sizeof(gl::TextParticleData);
     desc.usage = SG_USAGE_STREAM;
     return sg_make_buffer(desc);
 }
 
-gl::Buffer gl::CreateVertexBufferParticle() {
+sg_buffer gl::CreateVertexBufferParticle() {
     sg_buffer_desc desc {};
     desc.size = gl::State::maxParticles * sizeof(gl::ParticleData);
     desc.usage = SG_USAGE_STREAM;
     return sg_make_buffer(desc);
 }
 
-gl::Buffer gl::CreateIndexBuffer(const List<uint16_t>& indices) {
+sg_buffer gl::CreateIndexBuffer(const List<uint16_t>& indices) {
     sg_buffer_desc desc {};
     desc.data = sg_range { indices.data(), indices.size() * sizeof(uint16_t) };
     desc.type = SG_BUFFERTYPE_INDEXBUFFER;
     return sg_make_buffer(desc);
 }
 
-gl::Image gl::CreateImageRaw(const Bytes& data) {
+sg_image gl::CreateImageRaw(const List<Byte>& data) {
     sg_image_desc desc {};
     int ch;
 
@@ -184,11 +184,11 @@ gl::Image gl::CreateImageRaw(const Bytes& data) {
         desc.num_mipmaps = i + 1;
     }
 
-    gl::Image img = sg_make_image(desc);
+    sg_image img = sg_make_image(desc);
     return img;
 }
 
-gl::Image gl::CreateImageSimpleFromMemory(unsigned char* buffer, int w, int h) {
+sg_image gl::CreateImageSimpleFromMemory(unsigned char* buffer, int w, int h) {
     sg_image_desc desc {};
     desc.width = w;
     desc.height = h;
@@ -206,11 +206,11 @@ gl::Image gl::CreateImageSimpleFromMemory(unsigned char* buffer, int w, int h) {
         desc.num_mipmaps = i + 1;
     }
 
-    gl::Image img = sg_make_image(desc);
+    sg_image img = sg_make_image(desc);
     return img;
 }
 
-gl::Image gl::CreateImageSimple(StringView path) {
+sg_image gl::CreateImageSimple(StringView path) {
     int png_width, png_height, num_channels;
     const int desired_channels = 4;
     stbi_uc* ptr = stbi_load(path.data(), &png_width, &png_height, &num_channels, desired_channels);
@@ -231,7 +231,7 @@ gl::Image gl::CreateImageSimple(StringView path) {
         desc.num_mipmaps = i + 1;
     }
 
-    gl::Image img = sg_make_image(desc);
+    sg_image img = sg_make_image(desc);
     stbi_image_free(ptr);
     return img;
 }

@@ -1,7 +1,6 @@
 #include "prefab/pgameplay.h"
 #include "comp/ccore.h"
 #include "prefab/pphys.h"
-#include "state.h"
 #include "comp/cgameplay.h"
 #include "work/wcore.h"
 #include "tun/tcore.h"

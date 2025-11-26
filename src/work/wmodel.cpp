@@ -1,5 +1,4 @@
 #include "work/wmodel.h"
-#include "state.h"
 #include "tun/tentity.h"
 #include "tun/tgltf.h"
 #include "data/dprim.h"
@@ -12,6 +11,7 @@
 #include "prefab/pphys.h"
 #include "prefab/p.h"
 #include "tun/tcore.h"
+#include "tun/tcolor.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/matrix_decompose.hpp"
 
@@ -36,11 +36,11 @@ void work::LoadScene() {
         {"CheckpointVolume", prefab::CheckpointVolume},
     };
 
-    tun::logpush();
+    tlogpush();
     gltf::File scene {"res/models/Raves.glb"};
-    tun::logpop("gltf parse");
+    tlogpop("gltf parse");
 
-    tun::logpush();
+    tlogpush();
     for (auto& it : scene.textures) {
         auto& texture = it.second;
         texture->entity = reg.create();
@@ -49,9 +49,9 @@ void work::LoadScene() {
         textureAsset.name = texture->name;
         textureAsset.image = texture->image;
     }
-    tun::logpop("textures load");
+    tlogpop("textures load");
 
-    tun::logpush();
+    tlogpush();
     for (auto& it : scene.materials) {
         auto& material = it.second;
         material->entity = reg.create();
@@ -71,11 +71,11 @@ void work::LoadScene() {
         materialAsset.normalScale = material->normalScale;
         materialAsset.metallicFactor = material->metallicFactor;
         materialAsset.roughnessFactor = material->roughnessFactor;
-        materialAsset.tint = tun::white; // TODO change from constant to baseColorFactor or something
+        materialAsset.tint = tcolor::white; // TODO change from constant to baseColorFactor or something
     }
-    tun::logpop("materials load");
+    tlogpop("materials load");
 
-    tun::logpush();
+    tlogpush();
     for (auto& it : scene.models) {
         auto& model = it.second;
         model->entity = reg.create();
@@ -97,15 +97,13 @@ void work::LoadScene() {
             }
         }
     }
-    tun::logpop("models load");
+    tlogpop("models load");
 
-    tun::logpush();
+    tlogpush();
     for (auto& node : scene.nodes) {
-        //tun::log("LOAD NODE {}", node->name);
-
         if (!node->model && !node->light) {
             if (!node->name.starts_with("mixamorig")) {
-                tun::log("NODE {} HAS NO NOTHING EH", node->name);
+                tlog("NODE {} HAS NO NOTHING EH", node->name);
             }
             continue;
         }
@@ -121,20 +119,7 @@ void work::LoadScene() {
             }
         }
 
-        bool skinned {false};
-        if (node->model) {
-            for (auto& mesh : node->model->meshes) {
-                if (mesh && mesh->skinned) {
-                    skinned = true;
-                    break;
-                }
-            }
-        }
-
         node->entity = reg.create();
-        if (skinned) {
-            reg.emplace<SkinnedModelComp>(node->entity);
-        }
         auto& transformComp = reg.emplace<TransformComp>(node->entity);
         transformComp.entity = node->entity;
         reg.emplace<GLTFTag>(node->entity);
@@ -144,7 +129,6 @@ void work::LoadScene() {
         transformComp.scale = node->scale;
         transformComp.dirty = true;
         if (node->parent) {
-            tun::log("SET PARENT!!");
             transformComp.parent = Thing<TransformComp>(node->parent->entity);
         }
         if (node->model) {
@@ -154,20 +138,16 @@ void work::LoadScene() {
             for(auto& mesh : node->model->meshes) {
                 Entity meshEntity = reg.create();
                 auto& meshComp = reg.emplace<MeshComp>(meshEntity);
-                if (skinned) {
-                    reg.emplace<SkinnedModelComp>(meshEntity);
-                }
                 reg.emplace<GLTFTag>(meshEntity);
                 meshComp.asset = mesh->entity;
                 meshComp.model = node->entity;
                 if (isPBR && reg.valid(reg.get<MeshAssetComp>(mesh->entity).material)) {
                     const auto& parentMaterial = reg.get<MaterialPBRComp>(reg.get<MeshAssetComp>(mesh->entity).material);
                     auto& childMaterial = reg.emplace<MaterialPBRComp>(meshEntity, parentMaterial);
-                    childMaterial.skinned = mesh->skinned;
                 } else {
                     reg.emplace<MaterialColorComp>(meshEntity);
                     if (node->params.GetStringParam("category") != "spawn") {
-                        tun::log("MODEL {} HAS NO PBR MATERIAL", node->name);
+                        tlog("MODEL {} HAS NO PBR MATERIAL", node->name);
                     }
                 }
             }
@@ -177,8 +157,8 @@ void work::LoadScene() {
             materialColor.color = node->light->color;
             auto& lightComp = reg.emplace<PointLightComp>(node->entity);
             lightComp.color = node->light->color;
-            if (lightComp.color == tun::black) {
-                lightComp.color = tun::white;
+            if (lightComp.color == tcolor::black) {
+                lightComp.color = tcolor::white;
             }
             lightComp.intensity = node->light->intensity * 0.001f;
             lightComp.range = 5.f;
@@ -207,12 +187,12 @@ void work::LoadScene() {
             }
         }
     }
-    tun::logpop("nodes load");
+    tlogpop("nodes load");
 }
 
 void work::UnloadScene() {
     auto& bodyInterface = phys::state->physicsSystem.GetBodyInterface();
-    tun::log("UNLOAD SCENE!");
+    tlog("UNLOAD SCENE!");
     List<Entity> entitiesToRemove {};
     for (auto [entity] : reg.view<GLTFTag>().each()) {
         entitiesToRemove.push_back(entity);
@@ -226,7 +206,7 @@ void work::UnloadScene() {
         reg.destroy(entity);
     }
 
-    tun::log("SCENE UNLOADED");
+    tlog("SCENE UNLOADED");
     work::LoadScene();
 }
 

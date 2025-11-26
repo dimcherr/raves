@@ -13,9 +13,9 @@ struct MusicBoxComp {
     };
 
     Type type {green};
-    Entity base {entt::null};
-    Entity crank {entt::null};
-    Entity statue {entt::null};
+    Entity base {};
+    Entity crank {};
+    Entity statue {};
 
     float baseWindingPercent {0.f};
     float windingPercent {0.f};
@@ -41,7 +41,7 @@ struct MusicBoxPartComp {
         statue,
     };
 
-    Entity musicBox {entt::null};
+    Entity musicBox {};
     MusicBoxComp::Type musicBoxType {MusicBoxComp::green};
     Type type {crank};
     String inHandModelName {};
@@ -51,7 +51,7 @@ struct MusicBoxPartComp {
 
 struct PlatformComp {
     String endName {};
-    Entity end {entt::null};
+    Entity end {};
     //Thing<TweenComp> moving {};
     float linearTime {0.f};
     float speed {1.f};
@@ -80,7 +80,7 @@ struct CheckpointComp {
 
 struct CheckpointVolumeComp {
     int index {};
-    Entity checkpoint {entt::null};
+    Entity checkpoint {};
     String checkpointName {};
 };
 

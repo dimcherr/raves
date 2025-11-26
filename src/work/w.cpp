@@ -3,10 +3,10 @@
 #include "comp/cinput.h"
 #include "comp/cmaterial.h"
 #include "glm/gtc/quaternion.hpp"
-#include "state.h"
 #include "data/devent.h"
 #include "data/dsound.h"
 #include "data/dtween.h"
+#include "tun/tun.h"
 #include "tun/tmath.h"
 #include "tun/trandom.h"
 #include "tun/tsound.h"
@@ -28,7 +28,7 @@ static void UpdateMusicBox();
 static void UpdateKillZ();
 
 void work::UpdateGame() {
-    if (!state.paused) {
+    if (!tun::paused) {
         UpdateSubtitles();
         UpdateDoors();
         UpdatePlatforms();
@@ -37,10 +37,10 @@ void work::UpdateGame() {
     }
     UpdateKillZ();
 
-    if (state.gameOver) {
+    if (tun::gameOver) {
         for (auto [characterEntity, character, transform, body, camera] : reg.view<CharacterComp, TransformComp, BodyComp, CameraComp>().each()) {
-            state.gameOverFade += state.deltaTime * 0.3125f;
-            camera.yaw += state.deltaTime * 0.3125f;
+            tun::gameOverFade += tun::deltaTime * 0.3125f;
+            camera.yaw += tun::deltaTime * 0.3125f;
             if (camera.yaw > tun::pi * 2.f) {
                 camera.yaw -= tun::pi * 2.f;
             }
@@ -179,7 +179,7 @@ static void UpdateMusicBox() {
     #endif
 
     for (auto [entity, weapon] : reg.view<WeaponComp>().each()) {
-        if (state.gameOver) continue;
+        if (tun::gameOver) continue;
 
         if (reg.any_of<MusicBoxPartComp>(weapon.weaponModel) && reg.get<MusicBoxPartComp>(weapon.weaponModel).type == MusicBoxPartComp::base) {
             auto& musicBox = reg.get<MusicBoxComp>(reg.get<MusicBoxPartComp>(weapon.weaponModel).musicBox);
@@ -230,7 +230,7 @@ static void UpdateMusicBox() {
             musicBox.isHolding = false;
         }
 
-        if (!state.gameOver) {
+        if (!tun::gameOver) {
             if (musicBox.type == MusicBoxComp::green) {
                 asound::themeGreen().fading().speed = 1.f;
                 asound::themeGreen().SetPlayed(musicBox.isPlaying);
@@ -248,7 +248,7 @@ static void UpdateMusicBox() {
                 musicBox.onWindUp().delta = 0.f;
                 musicBox.onWindUp().time = 0.f;
                 if (!musicBox.isHolding) {
-                    musicBox.windingPercent -= state.deltaTime * musicBox.unwindingSpeed;
+                    musicBox.windingPercent -= tun::deltaTime * musicBox.unwindingSpeed;
                     if (musicBox.windingPercent > 0.f && !musicBox.isHolding && !musicBox.isWinding) {
                         musicBox.isPlaying = true;
                     }
@@ -276,7 +276,7 @@ static void UpdateMusicBox() {
                 }
             }
         } else {
-            musicBox.windingPercent += state.deltaTime * musicBox.rotatingDelta * musicBox.unwindingSpeed;
+            musicBox.windingPercent += tun::deltaTime * musicBox.rotatingDelta * musicBox.unwindingSpeed;
         }
 
         for (auto [platformEntity, platform] : reg.view<PlatformComp>().each()) {
@@ -308,67 +308,10 @@ static void UpdatePlayer() {
 static void UpdatePlatforms() {
     for (auto [characterEntity, character] : reg.view<CharacterComp>().each()) {
         for (auto [entity, platform, transform, body, model] : reg.view<PlatformComp, TransformComp, BodyComp, ModelComp>().each()) {
-            //if (platform.musicBoxType == MusicBoxComp::blue) {
-                //model.tint = tun::blue;
-            //} else if (platform.musicBoxType == MusicBoxComp::green) {
-                //model.tint = tun::green;
-            //} else if (platform.musicBoxType == MusicBoxComp::red) {
-                //model.tint = tun::red;
-            //}
-
             Vec prevTranslation = transform.translation;
             Quat prevRotation = transform.rotation;
 
-            // Update transform based on lerp
             auto& endTransform = reg.get<TransformComp>(platform.end);
-
-            if (platform.isGreen) {
-                model.tint = tun::green;
-                if (greenSwitch.value > 0.5f) {
-                    float period = tun::pi * 2.f;
-                    platform.linearTime += state.deltaTime * platform.speed * 15.f;
-                    if (platform.linearTime > period) {
-                        platform.linearTime -= period;
-                    } else if (platform.linearTime < 0.f) {
-                        platform.linearTime += period;
-                    }
-                    platform.time = (glm::sin(platform.linearTime) + 1.f) / 2.f; // from 0 to 1
-                }
-            }
-
-#if 0 
-            if (platform.musicBoxType == MusicBoxComp::red) {
-                platform.time = platform.winding + platform.offset;
-                if (platform.time > 1.f) {
-                    platform.time = 2.f - platform.time;
-                }
-                platform.linearTime = platform.time;
-            } else if (platform.musicBoxType == MusicBoxComp::blue) {
-                platform.linearTime += state.deltaTime * platform.speed * platform.delta * (1.f - platform.winding);
-                if (platform.linearTime > 2.f) {
-                    platform.linearTime -= 2.f;
-                } else if (platform.linearTime < 0.f) {
-                    platform.linearTime += 2.f;
-                }
-                if (platform.linearTime <= 1.f) {
-                    platform.time = platform.linearTime;
-                } else {
-                    platform.time = 2.f - platform.linearTime;
-                }
-            } else if (platform.musicBoxType == MusicBoxComp::green) {
-                platform.linearTime += state.deltaTime * platform.speed * platform.winding;
-                if (platform.linearTime > 2.f) {
-                    platform.linearTime -= 2.f;
-                } else if (platform.linearTime < 0.f) {
-                    platform.linearTime += 2.f;
-                }
-                if (platform.linearTime <= 1.f) {
-                    platform.time = platform.linearTime;
-                } else {
-                    platform.time = 2.f - platform.linearTime;
-                }
-            }
-#endif
 
             float rawTime = glm::clamp(platform.time, 0.f, 1.f);
             float t = tun::CurveAuto(rawTime);
@@ -376,9 +319,9 @@ static void UpdatePlatforms() {
             transform.rotation = tun::Lerp(platform.startRotation, endTransform.rotation, t);
             transform.dirty = true;
 
-            Vec linearVelocity = (transform.translation - prevTranslation) / state.deltaTime;
+            Vec linearVelocity = (transform.translation - prevTranslation) / tun::deltaTime;
             Quat deltaRotation = transform.rotation * glm::inverse(prevRotation);
-            Vec angularVelocity = glm::axis(deltaRotation) * glm::angle(deltaRotation) / state.deltaTime;
+            Vec angularVelocity = glm::axis(deltaRotation) * glm::angle(deltaRotation) / tun::deltaTime;
 
             auto& bodyInterface = phys::state->physicsSystem.GetBodyInterface();
 
@@ -412,19 +355,16 @@ static void UpdateDoors() {
 
 static void UpdateSubtitles() {
     if (ainput::skipSub().started) {
-        if (reg.valid(state.currentSubtitle)) {
-            auto& sub = reg.get<SubtitleComp>(state.currentSubtitle);
+        if (reg.valid(tun::currentSubtitle)) {
+            auto& sub = reg.get<SubtitleComp>(tun::currentSubtitle);
             if (sub.skippable) {
                 auto& subtitleShowing = atween::subtitleShowing();
                 if (subtitleShowing.time > 0.f && subtitleShowing.time < 1.f) {
                     subtitleShowing.time = 1.f;
                 } else if (subtitleShowing.time == 1.f) {
                     sub.active = false;
-                    state.currentSubtitle = entt::null;
-                    //if (reg.valid(sub.nextSubtitle)) {
-                        //work::PlaySubtitle(sub.nextSubtitle);
-                    //}
-                    if (auto* onSkip = sub.onSkip.Maybe()) {
+                    tun::currentSubtitle = {};
+                    if (auto* onSkip = sub.onSkip.maybe()) {
                         onSkip->Start();
                     }
                 }
@@ -433,7 +373,7 @@ static void UpdateSubtitles() {
     }
 
     for (auto [subtitleEntity, subtitle, text, bounds] : reg.view<SubtitleComp, TextComp, BoundsComp>().each()) {
-        if (subtitleEntity != state.currentSubtitle) continue;
+        if (subtitleEntity != tun::currentSubtitle) continue;
 
         auto& subtitleShowing = atween::subtitleShowing();
         if (subtitleShowing.delta != 0.f) {
@@ -455,7 +395,7 @@ static void UpdateSubtitles() {
             } else {
                 if (!subtitle.skippable) {
                     subtitle.active = false;
-                    state.currentSubtitle = entt::null;
+                    tun::currentSubtitle = {};
                 }
             }
         }
@@ -469,20 +409,20 @@ static void UpdateSubtitles() {
                 subtitle.soundTargetTime = tun::GetRandomFloat(subtitle.soundPeriodMin, subtitle.soundPeriodMax);
                 subtitle.soundElapsedTime = 0.f;
                 if (subtitle.speaker == 0) {
-                    auto& soundBoo = reg.get<SoundComp>(asound::boo);
+                    auto& soundBoo = reg.get<SoundComp>(asound::boo.entity);
                     soundBoo.Play();
                 } else if (subtitle.speaker == 1) {
                 }
             } else {
-                subtitle.soundElapsedTime += state.deltaTime;
+                subtitle.soundElapsedTime += tun::deltaTime;
             }
         }
     }
 }
 
 void work::PlaySubtitle(Entity entity) {
-    if (reg.valid(entity) && entity != state.currentSubtitle) {
-        state.currentSubtitle = entity;
+    if (reg.valid(entity) && entity != tun::currentSubtitle) {
+        tun::currentSubtitle = entity;
         for (auto [subtitleEntity, subtitle] : reg.view<SubtitleComp>().each()) {
             subtitle.active = false;
         }
@@ -512,7 +452,7 @@ static void UpdateKillZ() {
                     camera.yaw = angles.y;
                     camera.pitch = 0.f;
                     if (character.gameOvering().time > 0.f) {
-                        state.gameOver = true;
+                        tun::gameOver = true;
                     }
                 } else {
                     for (auto [entity, spawnTransform] : reg.view<SpawnPointCharacterComp, TransformComp>().each()) {

@@ -14,7 +14,7 @@ Prim::Prim(StringView prefix) : prefix(prefix) {
 }
 
 void CreatePrims() {
-    tun::logpush();
+    tlogpush();
 
     gltf::File scene {"res/models/Prims.glb", true};
     for (auto& scenePrim : scene.prims) {
@@ -38,7 +38,7 @@ void CreatePrims() {
         }
     }
 
-    tun::logpop("prims create");
+    tlogpop("prims create");
 }
 
 }

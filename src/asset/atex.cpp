@@ -9,15 +9,15 @@ Tex::Tex(StringView name) : name(name) {
 }
 
 void CreateTexs() {
-    tun::logpush();
+    tlogpush();
 
     for (auto* texture : textures) {
         texture->entity = reg.create();
         auto& textureAssetComp = reg.emplace<TextureAssetComp>(texture->entity);
-        textureAssetComp.image = gl::CreateImageSimple(tun::formatToString("res/textures/{}.png", texture->name.data()));
+        textureAssetComp.image = gl::CreateImageSimple(formatToString("res/textures/{}.png", texture->name.data()));
     }
 
-    tun::logpop("textures create");
+    tlogpop("textures create");
 }
 
 }

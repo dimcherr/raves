@@ -1,5 +1,4 @@
 #include "work/wsound.h"
-#include "state.h"
 #include "tags.h"
 #include "comp/csound.h"
 #include "data/dsound.h"

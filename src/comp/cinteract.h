@@ -4,14 +4,14 @@
 #include "asset/ainput.h"
 
 struct InteractableComp {
-    Entity parentBody {entt::null};
+    Entity parentBody {};
     Thing<TweenComp> onHover {};
     Thing<TweenComp> onInteract {};
     bool active {true};
 };
 
 struct WeaponComp {
-    Entity weaponModel {entt::null};
+    Entity weaponModel {};
     List<ainput::Input*> inputs {};
     float timeSinceChange {0.f};
 };

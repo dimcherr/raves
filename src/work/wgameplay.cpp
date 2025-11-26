@@ -1,6 +1,5 @@
 #include "work/wgameplay.h"
 #include "comp/c.h"
-#include "state.h"
 #include "data/dstring.h"
 #include "data/dsound.h"
 #include "data/devent.h"

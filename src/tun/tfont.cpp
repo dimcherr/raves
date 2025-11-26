@@ -14,7 +14,7 @@ static void initRange(stbtt_pack_range& range, float fontSize, int firstCodepoin
     range.chardata_for_range = (stbtt_packedchar*)malloc(range.num_chars * sizeof(stbtt_packedchar));
 }
 
-unsigned char* tun::readFont(const char* path) {
+unsigned char* tfont::readFont(const char* path) {
     FILE* fontFile = fopen(path, "rb");
     fseek(fontFile, 0, SEEK_END);
     long size = ftell(fontFile); /* how long is the file ? */
@@ -26,7 +26,7 @@ unsigned char* tun::readFont(const char* path) {
     return fontBuffer;
 }
 
-stbtt_pack_range* tun::packFont(stbtt_pack_context* ctx, const char* path, float fontSize, int numRanges) {
+stbtt_pack_range* tfont::packFont(stbtt_pack_context* ctx, const char* path, float fontSize, int numRanges) {
     unsigned char* fontBuffer = readFont(path);
     stbtt_pack_range* ranges = (stbtt_pack_range*)malloc(numRanges * sizeof(stbtt_pack_range));
     memset(ranges, 0, sizeof(stbtt_pack_range) * numRanges);
@@ -52,8 +52,8 @@ stbtt_pack_range* tun::packFont(stbtt_pack_context* ctx, const char* path, float
     return ranges;
 }
 
-tun::FontData tun::packFonts(const List<FontDesc>& fonts, int atlasSize, bool saveAtlas) {
-    tun::FontData fontData {};
+tfont::FontData tfont::packFonts(const List<FontDesc>& fonts, int atlasSize, bool saveAtlas) {
+    tfont::FontData fontData {};
     fontData.atlasSize = atlasSize;
     stbtt_pack_context ctx;
 
@@ -74,3 +74,4 @@ tun::FontData tun::packFonts(const List<FontDesc>& fonts, int atlasSize, bool sa
 
     return fontData;
 }
+

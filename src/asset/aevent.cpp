@@ -11,14 +11,14 @@ Event::Event(bool ongoing) : ongoing(ongoing) {
 Event::Event() : Event(false) {}
 
 void CreateEvents() {
-    tun::logpush();
+    tlogpush();
 
     for (auto* event : events) {
         event->entity = reg.create();
         reg.emplace<EventComp>(event->entity, event->ongoing);
     }
 
-    tun::logpop("events create");
+    tlogpop("events create");
 }
 
 }

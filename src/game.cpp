@@ -1,14 +1,14 @@
-#include "game/game.h"
+#include "game.h"
 #include "asset/apip.h"
 #include "asset/asurface.h"
 #include "comp/c.h"
 #include "data/dcue.h"
 #include "glm/trigonometric.hpp"
-#include "state.h"
 #include "tun/tcore.h"
 #include "tun/tlog.h"
 #include "tun/tmath.h"
 #include "tun/trandom.h"
+#include "tun/tun.h"
 #ifdef OS_WEB
 #include <emscripten.h>
 #endif
@@ -16,7 +16,6 @@
 #include "tun/tphys.h"
 #include "tun/tsound.h"
 #include "tun/tfont.h"
-#include "tun/tanim.h"
 #include "tags.h"
 #include "asset/atex.h"
 #include "asset/afont.h"
@@ -50,7 +49,6 @@
 #include "data/dsound.h"
 #include "asset/atween.h"
 #include "data/dinput.h"
-#include "state.h"
 
 #ifdef OS_WEB
 EMSCRIPTEN_KEEPALIVE
@@ -63,7 +61,7 @@ void onWebLoad() {
 void onWebLoad() {}
 #endif
 
-static void OnTrigger(JPH::BodyID bodyID) {
+static void onTrigger(JPH::BodyID bodyID) {
     for (auto [characterEntity, character] : reg.view<CharacterComp>().each()) {
         for (auto [volumeEntity, volume, volumeBody] : reg.view<CheckpointVolumeComp, BodyComp>().each()) {
             if (volumeBody.id == bodyID) {
@@ -86,18 +84,17 @@ static void OnTrigger(JPH::BodyID bodyID) {
     }
 }
 
-void game::Create() {
-    tun::log("game start");
-    tun::logpush();
+void game::create() {
+    tlog("game start");
+    tlogpush();
 
-        tun::logpush();
-            phys::Init(&OnTrigger);
+        tlogpush();
+            phys::Init(&onTrigger);
             gl::Init();
-            anim::Init();
             sound::Init();
-        tun::logpop("game init");
+        tlogpop("game init");
 
-        tun::logpush();
+        tlogpush();
             aevent::CreateEvents();
             atween::CreateTweens();
             ainput::CreateInputs();
@@ -109,27 +106,27 @@ void game::Create() {
             atex::CreateTexs();
             afont::CreateFonts();
             asurface::CreateSurfaces();
-        tun::logpop("asset create");
+        tlogpop("asset create");
 
-        tun::logpush();
+        tlogpush();
             work::LoadScene();
-        tun::logpop("scene load");
+        tlogpop("scene load");
 
-        tun::logpush();
+        tlogpush();
             prefab::Grid();
             prefab::Character();
             prefab::CameraFly(reg.get<TransformComp>(reg.view<CharacterComp>().back()).translation, tun::vecZero);
-        tun::logpop("common objects load");
+        tlogpop("common objects load");
 
-        tun::logpush();
+        tlogpush();
             prefab::Game();
-        tun::logpop("game load");
+        tlogpop("game load");
 
         onWebLoad();
-    tun::logpop("game create");
+    tlogpop("game create");
 }
 
-void game::Update() {
+void game::update() {
     uint64_t ticksStart = stm_now();
 
     // TODO good stuff
@@ -160,26 +157,26 @@ void game::Update() {
 
 
 
-    if (!state.paused || !state.gameInit) {
+    if (!tun::paused || !tun::gameInit) {
         work::UpdatePhysics();
 
-        if (!state.gameInit) {
-            state.gameInit = true;
+        if (!tun::gameInit) {
+            tun::gameInit = true;
         }
     }
 
-    if (!state.paused && !state.gameOver) {
-        if (state.firstPerson) {
+    if (!tun::paused && !tun::gameOver) {
+        if (tun::firstPerson) {
             work::UpdateRaycast();
             work::UpdateCameraRotation();
-            tun::LockMouse(true);
-        } else if (state.flyMode) {
+            tun::lockMouse(true);
+        } else if (tun::flyMode) {
             if (ainput::flyModeActivate().active) {
                 work::UpdateCameraRotation();
                 work::UpdateCameraMovement();
-                tun::LockMouse(true);
+                tun::lockMouse(true);
             } else {
-                tun::LockMouse(false);
+                tun::lockMouse(false);
             }
         }
     }
@@ -204,7 +201,7 @@ void game::Update() {
     gl::BeginOffscreenPass();
         work::DrawAmbience();
         work::DrawTurbulence();
-        if (state.debugDraw) {
+        if (tun::debugDraw) {
             work::DrawGrid();
             work::DrawLights();
             work::DrawColliders();
@@ -213,7 +210,7 @@ void game::Update() {
         }
     gl::EndRenderPass();
 
-    if (state.drawFPS) {
+    if (tun::drawFPS) {
         work::DrawFPS();
     }
 
@@ -229,8 +226,8 @@ void game::Update() {
     gl::EndDrawing();
 
 
-    if (state.gameOver) {
-        tun::LockMouse(false);
+    if (tun::gameOver) {
+        tun::lockMouse(false);
         asound::theme().SetPlayed(true);
         asound::themeGreen().SetPlayed(false);
         asound::themeBlue().SetPlayed(false);
@@ -238,18 +235,18 @@ void game::Update() {
     }
 
     work::UpdateEvents();
-    state.drawFPS = true;
-    state.mouseDeltaX = 0.f;
-    state.mouseDeltaY = 0.f;
+    tun::drawFPS = true;
+    tun::mouseDeltaX = 0.f;
+    tun::mouseDeltaY = 0.f;
 
-    state.updateCycleTime = stm_ms(stm_diff(stm_now(), ticksStart));
+    tun::updateCycleTime = stm_ms(stm_diff(stm_now(), ticksStart));
 }
 
-void game::Destroy() {
+void game::destroy() {
     gl::Shutdown();
 }
 
-void game::OnEvent(const sapp_event* event) {
+void game::onEvent(const sapp_event* event) {
     switch (event->type) {
         case SAPP_EVENTTYPE_MOUSE_SCROLL:
             for (auto [inputEntity, scrollInputComp, eventComp] : reg.view<ScrollInputComp, EventComp>().each()) {
@@ -308,14 +305,13 @@ void game::OnEvent(const sapp_event* event) {
                 eventComp.Start();
             }
 
-            state.mouseDeltaX = event->mouse_dx;
-            state.mouseDeltaY = event->mouse_dy;
-            state.mouseX = event->mouse_x;
-            state.mouseY = event->mouse_y;
-            state.normMouseX = 2.f * event->mouse_x / state.screenWidth - 1.f;
-            state.normMouseY = -(2.f * event->mouse_y / state.screenHeight - 1.f);
+            tun::mouseDeltaX = event->mouse_dx;
+            tun::mouseDeltaY = event->mouse_dy;
+            tun::normMouseX = 2.f * event->mouse_x / tun::screenWidth - 1.f;
+            tun::normMouseY = -(2.f * event->mouse_y / tun::screenHeight - 1.f);
             break;
         default:
             break;
     }
 }
+

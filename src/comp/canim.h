@@ -1,5 +1,4 @@
 #pragma once
-#include "tun/tthing.h"
 #include "comp/ccore.h"
 
 struct TweenComp {

@@ -9,7 +9,7 @@ BasePip::BasePip(PipFunc pipFunc, Type type) : pipFunc(pipFunc), type(type) {
 }
 
 void CreatePips() {
-    tun::logpush();
+    tlogpush();
 
     for (auto* pip : pips) {
         switch (pip->type) {
@@ -25,7 +25,7 @@ void CreatePips() {
         pip->pip = sg_make_pipeline(pip->pipFunc());
     }
 
-    tun::logpop("pips create");
+    tlogpop("pips create");
 }
 
 }

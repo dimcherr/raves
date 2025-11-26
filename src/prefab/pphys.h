@@ -16,7 +16,6 @@ Entity LightVolume(const gltf::ModelParams& params);
 Entity Surface(const gltf::ModelParams& params);
 
 Entity Character();
-Entity JohnDoe(const Vec3& position, StringView objectName, StringView animationName);
 Entity Tree(Entity entity, Entity modelAsset);
 Entity Dynamic(Entity entity, Entity modelAsset);
 

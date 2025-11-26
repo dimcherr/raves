@@ -9,9 +9,9 @@ Thing<InteractableComp> tun::CreateInteractable(Entity parentEntity, const Vec& 
     auto& interactableComp = reg.emplace<InteractableComp>(interactable.entity);
     interactableComp.parentBody = parentEntity;
     interactableComp.onHover = tun::CreateTween(3.f, TweenComp::once);
-    reg.get<TweenComp>(interactableComp.onHover).delta = 0.f;
+    reg.get<TweenComp>(interactableComp.onHover.entity).delta = 0.f;
     interactableComp.onInteract = tun::CreateTween(3.f, TweenComp::once);
-    reg.get<TweenComp>(interactableComp.onInteract).delta = 0.f;
+    reg.get<TweenComp>(interactableComp.onInteract.entity).delta = 0.f;
 
     SphereShapeComp& shapeComp = reg.emplace<SphereShapeComp>(interactable.entity, radius);
     TransformComp& transform = reg.emplace<TransformComp>(interactable.entity);

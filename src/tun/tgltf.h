@@ -5,6 +5,7 @@
 #include "tun/tmath.h"
 #include "tun/tgl.h"
 #include "tun/tstring.h"
+#include "tun/tcolor.h"
 
 namespace gltf {
 
@@ -19,8 +20,8 @@ struct FloatParam {
 };
 
 struct ModelParams {
-    Entity entity {entt::null};
-    Entity modelAsset {entt::null};
+    Entity entity {};
+    Entity modelAsset {};
     List<StringParam> strings {};
     List<FloatParam> floats {};
 
@@ -50,15 +51,15 @@ struct ModelDesc {
 };
 
 struct Texture {
-    Entity entity {entt::null};
+    Entity entity {};
     String name {};
-    gl::Image image {};
+    sg_image image {};
 
-    Texture(StringView name, gl::Image image) : name(name), image(image) {}
+    Texture(StringView name, sg_image image) : name(name), image(image) {}
 };
 
 struct Material {
-    Entity entity {entt::null};
+    Entity entity {};
     String name {};
     std::shared_ptr<Texture> baseColorTexture {};
     std::shared_ptr<Texture> normalTexture {};
@@ -67,23 +68,22 @@ struct Material {
     float metallicFactor {1.f};
     float roughnessFactor {1.f};
     float normalScale {1.f};
-    Color emissiveFactor {tun::white};
+    Color emissiveFactor {tcolor::white};
 };
 
 struct Model {
-    Entity entity {entt::null};
+    Entity entity {};
     BoundingBox boundingBox {};
     Vec offset {};
     List<std::shared_ptr<struct Mesh>> meshes {};
 };
 
 struct Mesh {
-    Entity entity {entt::null};
+    Entity entity {};
     std::shared_ptr<Model> model {};
     std::shared_ptr<Material> material {};
     List<float> vertices {};
     List<uint16_t> indices {};
-    bool skinned {false};
 };
 
 struct Light {
@@ -92,7 +92,7 @@ struct Light {
 };
 
 struct Node {
-    Entity entity {entt::null};
+    Entity entity {};
     String name {};
     Vec translation {};
     Quat rotation {};
@@ -130,8 +130,6 @@ struct File {
     }
 };
 
-/* Function to parse and print extras JSON for a given cgltf_data and extras field */
 char* parse_extras(const cgltf_data* data, const cgltf_extras* extras);
-
 
 }

@@ -2,7 +2,6 @@
 #include "tun/tphys.h"
 #include "tun/tmath.h"
 #include "tun/tentity.h"
-#include "tun/tthing.h"
 #include "asset/atween.h"
 
 struct RaycastComp {
@@ -10,12 +9,12 @@ struct RaycastComp {
 
     Vec start {};
     Vec end {};
-    Entity body {entt::null};
-    Thing<EventComp> onHit {entt::null};
+    Entity body {};
+    Thing<EventComp> onHit {};
 };
 
 struct SurfaceComp {
-    Entity stepSound {entt::null};
+    Entity stepSound {};
 };
 
 struct BodyComp {
@@ -63,21 +62,21 @@ struct CharacterComp {
     Vec hitForce {};
     bool jumping {false};
     bool crouched {false};
-    Entity pickable {entt::null};
+    Entity pickable {};
     bool moving {false};
     float timeSinceInteract {0.f};
 
-    Thing<TweenComp> interactPulsing {entt::null};
-    Entity interactable {entt::null};
-    Entity interactionRaycast {entt::null};
-    Entity stepRaycast {entt::null};
+    Thing<TweenComp> interactPulsing {};
+    Entity interactable {};
+    Entity interactionRaycast {};
+    Entity stepRaycast {};
 
     Thing<TweenComp> headBobbing {};
 
     Thing<TweenComp> killFading {};
 
     int checkpointIndex {-1};
-    Entity checkpoint {entt::null};
+    Entity checkpoint {};
 
     Thing<TweenComp> gameOvering {};
 };

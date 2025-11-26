@@ -2,10 +2,10 @@
 #include "data/dinput.h"
 #include "data/dpip.h"
 #include "glm/exponential.hpp"
-#include "state.h"
+#include "tun/tun.h"
 #include "tun/tgl.h"
-#include "tun/tanim.h"
 #include "tun/tcore.h"
+#include "tun/tcolor.h"
 #include "tags.h"
 #include "data/dtex.h"
 #include "data/dprim.h"
@@ -31,7 +31,7 @@ void work::DrawLighting(const Vec& lightPos, const Quat& lightRotation, const Ve
     Matrix m = tm * sm;
 
     Matrix lightView = tun::LookAt(lightPos, lightRotation);
-    Matrix lightProj = glm::perspective(glm::radians(80.f), state.screenRatio, 0.1f, 100.f);
+    Matrix lightProj = glm::perspective(glm::radians(80.f), tun::screenRatio, 0.1f, 100.f);
     Matrix lightViewProj = lightProj * lightView;
     pip.fs.lightMVP = lightViewProj;
 
@@ -55,7 +55,7 @@ void work::DrawAmbience() {
     pip.Use();
 
     pip.fs.ambientFactor = 0.005f;
-    pip.fs.time = state.gameTime;
+    pip.fs.time = tun::gameTime;
     for (auto [cameraEntity, camera, character] : reg.view<CameraComp, CharacterComp>().each()) {
         pip.fs.yaw = camera.yaw;
     }
@@ -73,8 +73,8 @@ void work::DrawBuffer() {
     pip.Use();
 
     pip.fs.intensity = 1.f;
-    pip.fs.tint = Vec4(tun::white, 1.f);
-    pip.fs.time = (float)state.time * 0.1f;
+    pip.fs.tint = Vec4(tcolor::white, 1.f);
+    pip.fs.time = (float)tun::time * 0.1f;
     pip.vs.mvp = Matrix(1.f);
     pip.bind.samplers[SMP_ppSmp] = asampler::screen.sampler;
     pip.bind.samplers[SMP_ppNoiseSmp] = asampler::main.sampler;
@@ -90,8 +90,8 @@ void work::DrawTextBuffer() {
 
     pip.fs.intensity = 1.f;
     pip.vs.mvp = Matrix(1.f);
-    pip.fs.tint = Vec4(tun::white, 1.f);
-    pip.fs.time = (float)state.time * 0.1f;
+    pip.fs.tint = Vec4(tcolor::white, 1.f);
+    pip.fs.time = (float)tun::time * 0.1f;
     pip.bind.samplers[SMP_ppSmp] = asampler::screen.sampler;
     pip.bind.samplers[SMP_ppNoiseSmp] = asampler::main.sampler;
     pip.bind.images[IMG_ppTexture] = gl::state.textColorBuffer;
@@ -141,9 +141,9 @@ void work::DrawColliders() {
         pip.vs.mvp = gl::state.viewProj * m;
 
         if (body.layer == phys::Layers::moving) {
-            pip.fs.color = tun::red;
+            pip.fs.color = tcolor::red;
         } else {
-            pip.fs.color = tun::blue;
+            pip.fs.color = tcolor::blue;
         }
 
         float maxSideLength = glm::max(shape.size.x * transform.scale.x, glm::max(shape.size.y * transform.scale.y, shape.size.z * transform.scale.z));
@@ -158,7 +158,7 @@ void work::DrawColliders() {
         Matrix ss = glm::scale({1.f}, Vec(shape.radius, shape.radius, shape.radius));
         Matrix m = t * s * ss;
         pip.vs.mvp = gl::state.viewProj * m;
-        pip.fs.color = Vec4(tun::darkPurple, 1.f);
+        pip.fs.color = Vec4(tcolor::darkPurple, 1.f);
 
         float maxSideLength = glm::max(shape.radius * transform.scale.x, glm::max(shape.radius * transform.scale.y, shape.radius * transform.scale.z));
         pip.fs.segmentCount = (int)glm::round(maxSideLength * 30.f);
@@ -172,7 +172,7 @@ void work::DrawColliders() {
         Matrix ss = glm::scale({1.f}, Vec(shape.radius, (shape.halfHeight + shape.radius) * 2.f, shape.radius));
         Matrix m = t * s * ss;
         pip.vs.mvp = gl::state.viewProj * m;
-        pip.fs.color = Vec4(tun::red, 1.f);
+        pip.fs.color = Vec4(tcolor::red, 1.f);
 
         float maxSideLength = glm::max(shape.radius * transform.scale.x, glm::max(shape.radius * transform.scale.y, shape.radius * transform.scale.z));
         pip.fs.segmentCount = (int)glm::round(maxSideLength * 30.f);
@@ -200,9 +200,9 @@ void work::DrawGColor() {
         auto* inventoryItem = reg.try_get<InventoryItemComp>(mesh.model);
         if (!IsInFrustum(mesh.model) && !inventoryItem) continue;
 
-        if (state.gameOver && inventoryItem) continue;
+        if (tun::gameOver && inventoryItem) continue;
 
-        if (inventoryItem && !state.paused && !state.gameOver) {
+        if (inventoryItem && !tun::paused && !tun::gameOver) {
             for (auto [inventoryEntity, inventory] : reg.view<InventoryComp>().each()) {
                 if (inventoryItem->inventory == inventoryEntity) {
                     for (auto [characterEntity, character, characterTransform] : reg.view<CharacterComp, TransformComp>().each()) {
@@ -222,7 +222,7 @@ void work::DrawGColor() {
                         float scale = slotWidth * inventoryItem->scaleAnim;
                         auto& boxShapeComp = reg.get<BoxShapeComp>(mesh.model);
                         scale /= boxShapeComp.size.x;
-                        Vec scaleVec = Vec(1.f, state.screenRatio, 1.f) * scale;
+                        Vec scaleVec = Vec(1.f, tun::screenRatio, 1.f) * scale;
 
                         Vec pos = gl::state.viewPos + boxShapeComp.offset;
 
@@ -251,7 +251,7 @@ void work::DrawGColor() {
                             tt = glm::translate(Matrix(1.f), Vec(x, y, -0.9f));
                         }
 
-                        float alpha = tun::CurveAuto(reg.get<TweenComp>(inventoryItem->inInventory).time);
+                        float alpha = tun::CurveAuto(reg.get<TweenComp>(inventoryItem->inInventory.entity).time);
                         Matrix scaledT = glm::scale(transform.worldTransform, Vec(inventoryItem->scaleAnim));
                         Matrix m = tun::Lerp(scaledT, t * r * rr * s, alpha);
 
@@ -270,7 +270,7 @@ void work::DrawGColor() {
         if (material.tintable) {
             pip.fs.albedoTint = Vec4(model.tint, 1.f);
         } else {
-            pip.fs.albedoTint = Vec4(tun::white, 1.f);
+            pip.fs.albedoTint = Vec4(tcolor::white, 1.f);
         }
         pip.fs.metallicFactor = 1.f;
         pip.fs.roughnessFactor = 1.f;
@@ -286,7 +286,7 @@ void work::DrawGColor() {
         if (reg.valid(material.emissiveTexture)) {
             pip.bind.images[IMG_gcolorEmissiveTex] = reg.get<TextureAssetComp>(material.emissiveTexture).image;
         } else {
-            pip.bind.images[IMG_gcolorEmissiveTex] = reg.get<TextureAssetComp>(atex::black).image;
+            pip.bind.images[IMG_gcolorEmissiveTex] = reg.get<TextureAssetComp>(atex::black.entity).image;
         }
 
         auto& meshAsset = reg.get<MeshAssetComp>(mesh.asset);
@@ -307,7 +307,7 @@ void work::DrawBoundingBoxes() {
         Matrix s = glm::scale({1.f}, Vec{0.1f, 0.1f, 0.1f});
         Matrix m = t * s;
         pip.vs.mvp = gl::state.viewProj * m;
-        pip.fs.color = tun::red;
+        pip.fs.color = tcolor::red;
 
         pip.Draw(aprim::cube);
 
@@ -317,7 +317,7 @@ void work::DrawBoundingBoxes() {
         s = glm::scale({1.f}, Vec{0.1f, 0.1f, 0.1f});
         m = t * s;
         pip.vs.mvp = gl::state.viewProj * m;
-        pip.fs.color = tun::blue;
+        pip.fs.color = tcolor::blue;
 
         pip.Draw(aprim::cube);
     });
@@ -333,7 +333,7 @@ void work::DrawRaycasts() {
         Matrix s = glm::scale({1.f}, Vec{pointSize, pointSize, pointSize});
         Matrix m = t * s;
         pip.vs.mvp = gl::state.viewProj * m;
-        pip.fs.color = reg.valid(raycast.body) ? tun::green : tun::darkPurple;
+        pip.fs.color = reg.valid(raycast.body) ? tcolor::green : tcolor::darkPurple;
         pip.fs.segmentCount = 4;
         pip.Draw(aprim::cube);
 
@@ -342,7 +342,7 @@ void work::DrawRaycasts() {
             s = glm::scale({1.f}, Vec{pointSize, pointSize, pointSize});
             m = t * s;
             pip.vs.mvp = gl::state.viewProj * m;
-            pip.fs.color = tun::red;
+            pip.fs.color = tcolor::red;
             pip.fs.segmentCount = 4;
             pip.Draw(aprim::cube);
         }

@@ -2,7 +2,6 @@
 #include "sokol_app.h"
 #include "tun/tmath.h"
 #include "tun/tentity.h"
-#include "tun/tthing.h"
 
 struct TransformComp {
     Matrix transform {1.f};
@@ -20,13 +19,13 @@ struct TransformComp {
     Vec worldScale {tun::vecOne};
     Quat worldRotation {tun::quatIdentity};
 
-    Entity entity {entt::null};
+    Entity entity {};
     Thing<TransformComp> parent {};
     bool dirty {true};
     bool childrenDirty {true};
 
     bool areChildrenDirty() {
-        if (parent.Maybe()) {
+        if (parent.maybe()) {
             return childrenDirty || parent().areChildrenDirty();
         } else {
             return childrenDirty;
@@ -51,7 +50,7 @@ struct EventComp {
     };
 
     bool ongoing {false};
-    Entity owner {entt::null};
+    Entity owner {};
     float floatValue {0.f};
 
     bool active {};

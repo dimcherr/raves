@@ -7,7 +7,7 @@
 #include <string>
 #include "tun/tlog.h"
 
-List<String> tun::ListFiles(StringView path) {
+List<String> tfile::list(StringView path) {
     List<String> result {};
     for (const auto& entry : std::filesystem::directory_iterator(path)) {
         result.push_back(entry.path().filename().string());
@@ -15,7 +15,7 @@ List<String> tun::ListFiles(StringView path) {
     return result;
 }
 
-String tun::ReadFile(StringView path) {
+String tfile::read(StringView path) {
     auto size = std::filesystem::file_size(path);
     String content(size, '\0');
     std::ifstream in(path.data());
@@ -23,7 +23,7 @@ String tun::ReadFile(StringView path) {
     return std::move(content);
 }
 
-Bytes tun::ReadFileBinary(StringView path) {
+List<Byte> tfile::readBinary(StringView path) {
     std::ifstream file(path.data(), std::ios::binary | std::ios::ate);
     
     if (!file.is_open()) {
@@ -32,16 +32,16 @@ Bytes tun::ReadFileBinary(StringView path) {
     
     std::streamsize size = file.tellg();
     file.seekg(0, std::ios::beg);
-    Bytes buffer(size);
+    List<Byte> buffer(size);
     if (size > 0 && !file.read(buffer.data(), size)) {
-        tun::error("Failed to read file: {}", path);
+        terror("Failed to read file: {}", path);
         return {};
     }
     
     return buffer;
 }
 
-bool tun::WriteFile(StringView path, StringView content) {
+bool tfile::write(StringView path, StringView content) {
     std::ofstream file(path.data());
     if (!file.is_open()) {
         return false;

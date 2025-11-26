@@ -1,8 +1,9 @@
 #include "work/wcore.h"
-#include "state.h"
 #include "comp/ccore.h"
+#include "tun/tun.h"
 #include "tun/tcore.h"
 #include "tun/tsound.h"
+#include "tun/tun.h"
 #include "data/dtween.h"
 #include "data/dinput.h"
 #include "data/devent.h"
@@ -10,24 +11,23 @@
 #include "asset/astring.h"
 
 void work::UpdateState() {
-
-    state.deltaTime = sapp_frame_duration();
-    state.time += state.deltaTime;
-    if (!state.paused) {
-        state.gameTime += state.deltaTime;
+    tun::deltaTime = sapp_frame_duration();
+    tun::time += tun::deltaTime;
+    if (!tun::paused) {
+        tun::gameTime += tun::deltaTime;
     }
-    state.screenWidth = sapp_widthf();
-    state.screenHeight = sapp_heightf();
-    state.screenRatio = state.screenWidth / state.screenHeight;
+    tun::screenWidth = sapp_widthf();
+    tun::screenHeight = sapp_heightf();
+    tun::screenRatio = tun::screenWidth / tun::screenHeight;
 
     if (ainput::toggleFullScreen().started) {
         sapp_toggle_fullscreen();
     }
 
     if (ainput::togglePause().started) {
-        if (state.gameStarted && !state.gameOver) {
-            state.paused = !state.paused;
-            if (!state.paused) {
+        if (tun::gameStarted && !tun::gameOver) {
+            tun::paused = !tun::paused;
+            if (!tun::paused) {
                 aevent::onPlay().Start();
             } else {
                 aevent::onPlay().Stop();
@@ -36,7 +36,7 @@ void work::UpdateState() {
     }
 
     if (aevent::onUpdateMouseSense().started) {
-        state.sensitivityFactor = tun::Lerp(0.5f, 4.f, aevent::onUpdateMouseSense().floatValue);
+        tun::sensitivityFactor = tun::Lerp(0.5f, 4.f, aevent::onUpdateMouseSense().floatValue);
     }
 
     if (aevent::onUpdateSoundVolume().started) {
@@ -48,16 +48,16 @@ void work::UpdateState() {
     }
 
     if (aevent::onPlay().started) {
-        state.paused = false;
-        tun::LockMouse(true);
+        tun::paused = false;
+        tun::lockMouse(true);
         asound::theme().SetPlayed(false);
 
-        if (!state.gameStarted) {
-            state.gameStarted = true;
+        if (!tun::gameStarted) {
+            tun::gameStarted = true;
         }
     } else if (aevent::onPlay().finished) {
-        state.paused = true;
-        tun::LockMouse(false);
+        tun::paused = true;
+        tun::lockMouse(false);
         asound::theme().SetPlayed(true);
     }
 
@@ -76,7 +76,7 @@ void work::UpdateTweens() {
     for (auto [entity, tween] : reg.view<TweenComp>().each()) {
         if (!tween.active || tween.delta == 0.f) continue;
 
-        tween.time += state.deltaTime * tween.speed * tween.delta;
+        tween.time += tun::deltaTime * tween.speed * tween.delta;
         switch (tween.type) {
             case TweenComp::circle:
                 if (tween.time > tun::pi * 2.f && tween.delta > 0.f) {

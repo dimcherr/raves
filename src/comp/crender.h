@@ -1,15 +1,12 @@
 #pragma once
-#include "tun/tanim.h"
 #include "tun/tstring.h"
 #include "tun/tgl.h"
 #include "tun/tmath.h"
 #include "tun/tentity.h"
 #include "tun/tlist.h"
-#include "tun/tthing.h"
+#include "tun/tcolor.h"
 
 struct GLTFTag {};
-
-struct SkinnedModelComp {};
 
 struct CameraComp {
     Matrix projection {1.f};
@@ -44,52 +41,51 @@ struct LightVolumeComp {
 
 struct TextureAssetComp {
     String name {};
-    gl::Image image {};
+    sg_image image {};
 };
 
 struct PointLightComp {
-    Color color {tun::white};
+    Color color {tcolor::white};
     float intensity {1.f};
     float range {1.f};
-    Entity lightVolume {entt::null};
+    Entity lightVolume {};
 };
 
 struct MaterialPBRComp {
     String name {};
-    Color tint {tun::white};
-    Entity baseColorTexture {entt::null};
-    Entity normalTexture {entt::null};
-    Entity ormTexture {entt::null};
-    Entity emissiveTexture {entt::null};
+    Color tint {tcolor::white};
+    Entity baseColorTexture {};
+    Entity normalTexture {};
+    Entity ormTexture {};
+    Entity emissiveTexture {};
     float metallicFactor {0.5f};
     float roughnessFactor {0.5f};
     float normalScale {1.f};
     float emissiveFactor {1.f};
     float ambientFactor {0.01f};
     bool doubleSided {false};
-    bool skinned {false};
     // TODO hacky solution for quick tintable materials
     bool tintable {false};
 };
 
 struct MaterialColorComp {
-    Color color {tun::white};
+    Color color {tcolor::white};
 };
 
 struct MaterialGridComp {
-    Color color {tun::black};
+    Color color {tcolor::black};
     int segmentCount {10};
 };
 
 struct MaterialTextComp {
-    Color color {tun::black};
+    Color color {tcolor::black};
     float opacity {1.f};
-    Entity texture {entt::null};
+    Entity texture {};
 };
 
 struct MeshAssetComp {
-    Entity modelAsset {entt::null};
-    Entity material {entt::null};
+    Entity modelAsset {};
+    Entity material {};
     gl::DrawData drawData {};
 
     void LoadVertexBuffer(const List<float>& vertices) {
@@ -114,24 +110,11 @@ struct ModelAssetComp {
 struct ModelComp {
     String name {};
     Entity modelAsset {};
-    Color tint {tun::white};
-    Color highlight {tun::black};
+    Color tint {tcolor::white};
+    Color highlight {tcolor::black};
     bool active {true};
     bool visible {true};
-    Entity lightVolume {entt::null};
-};
-
-struct SkeletonAssetComp {
-    anim::Skeleton skeleton {};
-    String name {};
-};
-
-struct SkeletonComp {
-    Entity asset {entt::null};
-    gl::Image jointTexture {};
-    int animationIndex {0};
-    float animationTime {0.f};
-    float animationDelta {1.f};
+    Entity lightVolume {};
 };
 
 struct ParticleEmitterComp {
@@ -144,6 +127,6 @@ struct FireComp {
 
 // TODO generic material
 struct MaterialComp {
-    Color tint {tun::white};
+    Color tint {tcolor::white};
     float opacity {1.f};
 };

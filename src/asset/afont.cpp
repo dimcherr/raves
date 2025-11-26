@@ -1,24 +1,25 @@
 #include "asset/afont.h"
+#include "tun/tun.h"
 
 namespace afont {
 
 static List<Font*> fonts {};
 
-Font::Font(const List<tun::FontDesc>& descs, int size, bool saveAtlas) : descs(descs), size(size), saveAtlas(saveAtlas) {
+Font::Font(const List<tfont::FontDesc>& descs, int size, bool saveAtlas) : descs(descs), size(size), saveAtlas(saveAtlas) {
     fonts.push_back(this);
 }
 
 void CreateFonts() {
-    tun::logpush();
+    tlogpush();
 
     for (auto* font : fonts) {
         font->entity = reg.create();
         auto& fontTextureAssetComp = reg.emplace<TextureAssetComp>(font->entity);
-        state.fontData = tun::packFonts(font->descs, font->size, font->saveAtlas);
-        fontTextureAssetComp.image = state.fontData.fontAtlas;
+        tun::fontData = tfont::packFonts(font->descs, font->size, font->saveAtlas);
+        fontTextureAssetComp.image = tun::fontData.fontAtlas;
     }
 
-    tun::logpop("fonts create");
+    tlogpop("fonts create");
 }
 
 }

@@ -23,7 +23,7 @@ TwoAxisInput::TwoAxisInput() {
 }
 
 void CreateInputs() {
-    tun::logpush();
+    tlogpush();
 
     for (auto* input : inputs) {
         input->entity = reg.create();
@@ -42,7 +42,7 @@ void CreateInputs() {
         reg.emplace<TwoAxisInputComp>(twoAxisInput->entity);
     }
 
-    tun::logpop("inputs create");
+    tlogpop("inputs create");
 }
 
 }

@@ -1,16 +1,15 @@
 #include "tun/tsound.h"
-#include "state.h"
 #include "tun/tlog.h"
 #include "tun/trandom.h"
 #include "comp/csound.h"
 
 void sound::Init() {
-    tun::logpush();
+    tlogpush();
 
     InitAudioDevice();
     ::SetAudioStreamBufferSizeDefault(1600 * 4);
 
-    tun::logpop("sound init");
+    tlogpop("sound init");
 }
 
 void sound::PlaySound(const Sound& sound, float pan, float pitch) {

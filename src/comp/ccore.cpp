@@ -2,7 +2,7 @@
 #include "comp/cphys.h"
 
 void TransformComp::Update() {
-    if (auto* parentMaybe = parent.Maybe()) {
+    if (auto* parentMaybe = parent.maybe()) {
         auto* parentTransform = reg.try_get<TransformComp>(parent.entity);
         if (parentTransform) {
             if (parentMaybe->dirty) {
@@ -20,7 +20,7 @@ void TransformComp::Update() {
         Matrix s = glm::scale({1.f}, scale);
         transform = t * r * s;
 
-        if (auto* parentMaybe = parent.Maybe()) {
+        if (auto* parentMaybe = parent.maybe()) {
             worldTransform = parentMaybe->worldTransform * transform;
             worldTranslation = parentMaybe->worldTranslation + translation;
             worldRotation = parentMaybe->worldRotation * rotation;

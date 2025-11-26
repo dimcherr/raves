@@ -3,7 +3,6 @@
 #include "tun/tentity.h"
 #include "tun/tstring.h"
 #include "tun/tgl.h"
-#include "tun/tthing.h"
 #include "asset/astring.h"
 #include "asset/atween.h"
 
@@ -53,7 +52,7 @@ struct ButtonComp {
 
 struct LayoutComp {
     Vec2 offset {};
-    Entity parent {entt::null};
+    Entity parent {};
     tun::Anchors parentAnchors {};
     tun::Anchors anchors {};
 };
@@ -67,8 +66,8 @@ struct SubtitleComp {
     float soundElapsedTime {0.f};
     float soundTargetTime {0.f};
 
-    Entity nextSubtitle {entt::null};
-    Entity prevSubtitle {entt::null};
+    Entity nextSubtitle {};
+    Entity prevSubtitle {};
     Thing<EventComp> onPlayed {};
 
     int speaker {0};

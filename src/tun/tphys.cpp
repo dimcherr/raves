@@ -2,7 +2,6 @@
 #include <cstdarg>
 #include "Jolt/Core/IssueReporting.h"
 #include "comp/cphys.h"
-#include "state.h"
 #include "tun/tlog.h"
 #include "tun/tcore.h"
 
@@ -17,14 +16,14 @@ static void TraceImpl(const char *inFMT, ...) {
 #ifdef JPH_ENABLE_ASSERTS
 
 static bool AssertFailedImpl(const char *inExpression, const char *inMessage, const char *inFile, unsigned int inLine) {
-    tun::log("JPH ASSERT {} {} {} {}", inExpression, inMessage != nullptr ? inMessage : "", inFile, inLine);
+    tlog("JPH ASSERT {} {} {} {}", inExpression, inMessage != nullptr ? inMessage : "", inFile, inLine);
 	return true; // DON'T Trigger breakpoint
 };
 
 #endif
 
 void phys::Init(void(*onTrigger)(JPH::BodyID)) {
-    tun::logpush();
+    tlogpush();
 
     JPH::Trace = &TraceImpl;
 
@@ -52,7 +51,7 @@ void phys::Init(void(*onTrigger)(JPH::BodyID)) {
 	phys::state->physicsSystem.SetContactListener(&phys::state->contactListener);
     phys::state->onTrigger = onTrigger;
 
-    tun::logpop("phys init");
+    tlogpop("phys init");
 }
 
 void phys::OnCharacterContactStart(JPH::BodyID bodyID) {
@@ -128,7 +127,7 @@ void phys::Raycast(RaycastComp& raycastComp, const Vec& start, const Vec& direct
     } else {
         if (reg.valid(raycastComp.body)) {
             raycastComp.onHit().Stop();
-            raycastComp.body = entt::null;
+            raycastComp.body = {};
         }
     }
 }

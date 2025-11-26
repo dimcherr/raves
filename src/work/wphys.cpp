@@ -1,5 +1,4 @@
 #include "work/wphys.h"
-#include "state.h"
 #include "tags.h"
 #include "data/dtween.h"
 #include "data/dsound.h"
@@ -12,6 +11,7 @@
 #include "comp/cui.h"
 #include "comp/cgameplay.h"
 #include "comp/cinteract.h"
+#include "tun/tun.h"
 #include "tun/tmath.h"
 #include "tun/tphys.h"
 #include "tun/tcore.h"
@@ -19,7 +19,7 @@
 
 void work::UpdatePhysics() {
     const int collisionSteps = 2;
-    phys::state->physicsSystem.Update(state.deltaTime, collisionSteps, &phys::state->tempAllocator, &phys::state->jobSystem);
+    phys::state->physicsSystem.Update(tun::deltaTime, collisionSteps, &phys::state->tempAllocator, &phys::state->jobSystem);
 
     for (auto [characterEntity, character, transform, shape, camera] : reg.view<CharacterComp, TransformComp, CapsuleShapeComp, CameraComp, tag::Current>().each()) {
         if (!character.character) {
@@ -32,11 +32,11 @@ void work::UpdatePhysics() {
             character.character = new JPH::CharacterVirtual(&settings, Convert(transform.translation), Convert(transform.rotation), &phys::state->physicsSystem);
             character.character->SetListener(&phys::state->characterContactListener);
         } else {
-            if (!state.firstPerson) {
+            if (!tun::firstPerson) {
                 continue;
             }
 
-            if (state.gameOver) continue;
+            if (tun::gameOver) continue;
 
             auto& bodyInterface = phys::state->physicsSystem.GetBodyInterface();
             bool grounded = character.character->GetGroundState() == JPH::CharacterVirtual::EGroundState::OnGround;
@@ -54,7 +54,7 @@ void work::UpdatePhysics() {
 
             bool doubleJump {false};
             if (!grounded) {
-                character.flyTime += state.deltaTime;
+                character.flyTime += tun::deltaTime;
             } else {
                 character.flyTime = 0.f;
                 character.alreadyDoubleJumped = false;
@@ -99,14 +99,14 @@ void work::UpdatePhysics() {
             if (reg.any_of<JumpComp>(characterEntity) && ainput::jump().active) {
                 if (ainput::jump().started && grounded || !character.alreadyDoubleJumped && character.flyTime > 0.333f && reg.any_of<DoubleJumpComp>(characterEntity)) {
                     character.jumping = true;
-                    reg.get<JumpComp>(characterEntity).time += state.deltaTime;
+                    reg.get<JumpComp>(characterEntity).time += tun::deltaTime;
                     if (!grounded) {
                         character.alreadyDoubleJumped = true;
                         doubleJump = true;
                     }
                 } else if (reg.get<JumpComp>(characterEntity).time > 0.f) {
                     auto& jumpComp = reg.get<JumpComp>(characterEntity);
-                    jumpComp.time += state.deltaTime;
+                    jumpComp.time += tun::deltaTime;
                     if (jumpComp.time > jumpComp.maxTime) {
                         jumpComp.time = 0.f;
                     }
@@ -145,7 +145,7 @@ void work::UpdatePhysics() {
                 character.moving = false;
             }
 
-            character.actualSpeed = tun::Lerp(character.actualSpeed, character.speed * movementVectorLen, 2.f * state.deltaTime);
+            character.actualSpeed = tun::Lerp(character.actualSpeed, character.speed * movementVectorLen, 2.f * tun::deltaTime);
 
             character.hitForce = tun::Lerp(character.hitForce, tun::vecZero, 0.05f);
 
@@ -160,7 +160,7 @@ void work::UpdatePhysics() {
                 if (reg.any_of<JumpComp>(characterEntity) && reg.get<JumpComp>(characterEntity).time > 0.f) {
                     jumpVel = Convert(character.jumpStrength * Vec(0.f, 1.f, 0.f));
                 }
-                character.character->SetLinearVelocity(((physicsSystem.GetGravity() * 1.5f + Convert(character.hitForce)) * state.deltaTime + movementVel + jumpVel) + character.character->GetGroundVelocity());
+                character.character->SetLinearVelocity(((physicsSystem.GetGravity() * 1.5f + Convert(character.hitForce)) * tun::deltaTime + movementVel + jumpVel) + character.character->GetGroundVelocity());
             } else {
                 for (const auto& contact : character.character->GetActiveContacts()) {
                     if (!contact.mIsSensorB && contact.mHadCollision && contact.mSurfaceNormal.GetY() < -0.9f) { // Ceiling hit
@@ -173,13 +173,13 @@ void work::UpdatePhysics() {
                 if (reg.any_of<JumpComp>(characterEntity) && reg.get<JumpComp>(characterEntity).time > 0.f) {
                     jumpVel = Convert(character.jumpStrength * Vec(0.f, 1.25f, 0.f));
                 }
-                JPH::Vec3 verticalVel = JPH::Vec3(0.f, character.character->GetLinearVelocity().GetY(), 0.f) + jumpVel * state.deltaTime;
-                character.character->SetLinearVelocity(((physicsSystem.GetGravity() * 1.5f + Convert(character.hitForce)) * 1.5f * state.deltaTime + movementVel) + verticalVel);
+                JPH::Vec3 verticalVel = JPH::Vec3(0.f, character.character->GetLinearVelocity().GetY(), 0.f) + jumpVel * tun::deltaTime;
+                character.character->SetLinearVelocity(((physicsSystem.GetGravity() * 1.5f + Convert(character.hitForce)) * 1.5f * tun::deltaTime + movementVel) + verticalVel);
             }
 
 
             character.character->ExtendedUpdate(
-                state.deltaTime,
+                tun::deltaTime,
                 physicsSystem.GetGravity(),
                 updateSettings,
                 physicsSystem.GetDefaultBroadPhaseLayerFilter(phys::Layers::character),
@@ -302,9 +302,9 @@ void work::UpdatePhysics() {
         }
     });
 
-    ++state.physicsCounter;
+    ++tun::physicsCounter;
 
-    if (state.physicsCounter == 3) {
+    if (tun::physicsCounter == 3) {
         for (auto [modelEntity, model, modelBody, modelTransform] : reg.view<ModelComp, BodyComp, TransformComp>().each()) {
             float closestDist = 100000000.f;
             for (auto [lightVolumeEntity, volume, volumeTransform, volumeBody, volumeModel] : reg.view<LightVolumeComp, TransformComp, BodyComp, ModelComp>().each()) {

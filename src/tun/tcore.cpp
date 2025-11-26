@@ -1,12 +1,6 @@
 #include "tun/tcore.h"
-#include "state.h"
 #include "data/devent.h"
 #include "comp/cphys.h"
-
-void tun::LockMouse(bool mouseLocked) {
-    sapp_lock_mouse(mouseLocked);
-    sapp_show_mouse(!mouseLocked);
-}
 
 Thing<TweenComp> tun::CreateTween(float speed, TweenComp::Type type, float offset) {
     Thing<TweenComp> tween {};

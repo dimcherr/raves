@@ -1,4 +1,4 @@
-#include "game/game.h"
+#include "game.h"
 #include "sokol_app.h"
 #include "sokol_log.h"
 #include "sokol_time.h"
@@ -12,10 +12,10 @@ sapp_desc sokol_main(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
     sapp_desc desc {};
-    desc.init_cb = &game::Create;
-    desc.frame_cb = &game::Update;
-    desc.cleanup_cb = &game::Destroy;
-    desc.event_cb = &game::OnEvent;
+    desc.init_cb = &game::create;
+    desc.frame_cb = &game::update;
+    desc.cleanup_cb = &game::destroy;
+    desc.event_cb = &game::onEvent;
 
     float ratio = 1920 / 1080.f;
     desc.width = 1517;
@@ -39,7 +39,7 @@ sapp_desc sokol_main(int argc, char* argv[]) {
         int png_width, png_height, num_channels;
         const int desired_channels = 4;
         stbi_uc* ptr = stbi_load(
-                tun::formatToString("res/textures/icon{}.png", dim).c_str(),
+                formatToString("res/textures/icon{}.png", dim).c_str(),
                 &png_width,
                 &png_height,
                 &num_channels,

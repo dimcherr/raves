@@ -1,6 +1,5 @@
 #include "work/wui.h"
 #include "comp/cmaterial.h"
-#include "state.h"
 #include "data/dcue.h"
 #include "data/dstring.h"
 #include "data/dtween.h"
@@ -13,9 +12,11 @@
 #include "data/dsampler.h"
 #include "data/devent.h"
 #include "raudio/raudio.h"
+#include "tun/tun.h"
 #include "tun/tgl.h"
 #include "tun/tcore.h"
 #include "tun/tmath.h"
+#include "tun/tcolor.h"
 #include "utf8.h"
 #include "tags.h"
 #include "comp/cui.h"
@@ -35,65 +36,42 @@ static void CalculateBoundsPos(const LayoutComp& layout, BoundsComp& bounds);
 
 void work::UpdateUI() {
     reg.view<BoundsComp>().each([](Entity entity, BoundsComp& bounds) {
-        bounds.visible = state.paused && reg.any_of<tag::Menu>(entity) ||
-                        !state.paused && reg.any_of<tag::HUD>(entity)  ||
-                         state.drawFPS && reg.any_of<FPSComp>(entity);
+        bounds.visible = tun::paused && reg.any_of<tag::Menu>(entity) ||
+                        !tun::paused && reg.any_of<tag::HUD>(entity)  ||
+                         tun::drawFPS && reg.any_of<FPSComp>(entity);
 
         if (reg.any_of<SubtitleComp>(entity)) {
             auto& subtitle = reg.get<SubtitleComp>(entity);
             if (subtitle.active) {
-                bounds.visible = !state.paused;
+                bounds.visible = !tun::paused;
             } else {
                 bounds.visible = false;
             }
         }
 
-        //if (reg.any_of<TooltipComp>(entity)) {
-            //if (state.paused) {
-                //bounds.visible = false;
-            //}
-        //}
-
         if (reg.any_of<SkipTooltipComp>(entity)) {
             bounds.visible = false;
             reg.get<TextComp>(entity).fontSize = 14.f;
             reg.get<LayoutComp>(entity).offset = {0.5f, 0.9f};
-            //if (state.gameTime >= 7.f && state.gameTime < 12.f) {
-                //bounds.visible = !state.paused;
-                //for (auto [entity, text] : reg.view<SkipTooltipComp, TextComp>().each()) {
-                    //text.text = &astring::clickToContinueWithMouseWheel;
-                //}
-            //} else if (state.gameTime >= 13.f && state.gameTime < 18.f) {
-                //bounds.visible = !state.paused;
-                //for (auto [entity, text] : reg.view<SkipTooltipComp, TextComp>().each()) {
-                    //text.text = &astring::clickToContinueWithCrouch;
-                //}
-            //} else if (state.gameTime >= 19.f && state.gameTime < 25.f) {
-                //bounds.visible = !state.paused;
-                //for (auto [entity, text] : reg.view<SkipTooltipComp, TextComp>().each()) {
-                    //text.text = &astring::clickToContinueWithTab;
-                //}
-            //} else {
-                for (auto [entity, text] : reg.view<SkipTooltipComp, TextComp>().each()) {
-                    text.text = &astring::clickToContinue;
-                }
+            for (auto [entity, text] : reg.view<SkipTooltipComp, TextComp>().each()) {
+                text.text = &astring::clickToContinue;
+            }
 
-                if (reg.valid(state.currentSubtitle)) {
-                    if (auto* sub = reg.try_get<SubtitleComp>(state.currentSubtitle)) {
-                        if (sub->skippable && !state.paused) {
-                            bounds.visible = true;
-                        }
+            if (reg.valid(tun::currentSubtitle)) {
+                if (auto* sub = reg.try_get<SubtitleComp>(tun::currentSubtitle)) {
+                    if (sub->skippable && !tun::paused) {
+                        bounds.visible = true;
                     }
                 }
-            //}
+            }
         }
 
         if (reg.any_of<tag::Inventory>(entity)) {
-            bounds.visible = !state.paused;
+            bounds.visible = !tun::paused;
         }
 
         if (reg.any_of<tag::GameOverText>(entity) || reg.any_of<tag::GameName>(entity)) {
-            if (state.gameOver) {
+            if (tun::gameOver) {
                 bounds.visible = true;
                 if (bounds.fading().time == 0.f) {
                     bounds.fading().time = 0.0001f;
@@ -112,13 +90,13 @@ void work::DrawCrosshair() {
 
     float scale = 0.01f;
     float scaleX = scale;
-    float scaleY = scale * state.screenRatio;
+    float scaleY = scale * tun::screenRatio;
     Matrix sm = glm::scale(Matrix(1.f), Vec3(scaleX, scaleY, 1.f));
     Matrix tm = glm::translate(Matrix(1.f), tun::vecZero - Vec3(scaleX * 0.5f, scaleY * 0.5f, -0.9999f));
     Matrix m = tm * sm;
 
     pip.vs.mvp = m;
-    pip.fs.color = Vec4(tun::white, 1.f);
+    pip.fs.color = Vec4(tcolor::white, 1.f);
 
     pip.Draw(aprim::quad().drawData);
 }
@@ -127,10 +105,10 @@ void work::UpdateTextParticles() {
     int charIndex = 0;
     reg.view<TextComp, BoundsComp, LayoutComp, MaterialTextComp>().each([&charIndex](Entity entity, const TextComp& text, BoundsComp& bounds, const LayoutComp& layout, const MaterialTextComp& material) {
         if (!bounds.visible) return;
-        float scaleCoef = state.screenWidth / 1920.f;
+        float scaleCoef = tun::screenWidth / 1920.f;
 
-        float pixelScaleX = (4.f * scaleCoef * text.fontSize) / state.screenWidth;
-        float pixelScaleY = (4.f * scaleCoef * text.fontSize) / state.screenHeight;
+        float pixelScaleX = (4.f * scaleCoef * text.fontSize) / tun::screenWidth;
+        float pixelScaleY = (4.f * scaleCoef * text.fontSize) / tun::screenHeight;
         StringView targetText = text.textOverride.size() > 0 ? text.textOverride : text.text->Get();
         auto it = targetText.begin();
         int startCharIndex = charIndex;
@@ -155,15 +133,15 @@ void work::UpdateTextParticles() {
                 continue;
             }
             uint32_t codePoint = utf8::next(it, targetText.end());
-            auto& font = state.fontData.fonts[text.fontIndex];
+            auto& font = tun::fontData.fonts[text.fontIndex];
             float fontScaleX = pixelScaleX / font.fontSize;
             float fontScaleY = pixelScaleY / font.fontSize;
             for (int i = 0; i < font.numRanges; ++i) {
                 auto& range = font.ranges[i];
                 if (codePoint >= range.first_unicode_codepoint_in_range && codePoint < range.first_unicode_codepoint_in_range + range.num_chars) {
                     stbtt_packedchar* packedChar = &range.chardata_for_range[codePoint - range.first_unicode_codepoint_in_range];
-                    Vec2 uvPos = {packedChar->x0 / state.fontData.atlasSize, packedChar->y0 / state.fontData.atlasSize};
-                    Vec2 uvSize = {(packedChar->x1 - packedChar->x0) / state.fontData.atlasSize, (packedChar->y1 - packedChar->y0) / state.fontData.atlasSize};
+                    Vec2 uvPos = {packedChar->x0 / tun::fontData.atlasSize, packedChar->y0 / tun::fontData.atlasSize};
+                    Vec2 uvSize = {(packedChar->x1 - packedChar->x0) / tun::fontData.atlasSize, (packedChar->y1 - packedChar->y0) / tun::fontData.atlasSize};
 
                     Vec4 instPos = Vec4(
                         xoffset + packedChar->xoff * fontScaleX + pixelScaleX * font.xoffset,
@@ -209,7 +187,7 @@ void work::UpdateTextParticles() {
             auto& p = gl::state.textParticleData[i].instPos;
             auto& d = gl::state.textParticleData[i].instDeform;
             Vec2 instPos = bounds.pos + Vec2(p.x + p.z * 0.5f, -p.y - p.w * 0.5f);
-            Vec2 gravityVector = Vec2{state.normMouseX, state.normMouseY} - instPos;
+            Vec2 gravityVector = Vec2{tun::normMouseX, tun::normMouseY} - instPos;
             float len = glm::length(gravityVector);
             if (len < 0.25f) {
                 float amp = tun::Lerp(0.f, len * 0.1f, 1.f - len * 4.f);
@@ -221,16 +199,10 @@ void work::UpdateTextParticles() {
             }
 
             if (animated) {
-                //gl::state.textParticleData[i].instColor.a = tun::Lerp(1.f, glm::clamp(glm::abs(wordPercent - 0.5f) * 2.f, 0.25f, 1.f), clickAnimation);
                 float visibility = text.visiblePercent >= wordPercent ? 1.f : 0.f;
                 gl::state.textParticleData[i].instColor.a *= visibility;
             }
             gl::state.textParticleData[i].instMVP = instMVP;
-
-            //if (reg.any_of<tag::GameName>(entity)) {
-                //gl::state.textParticleData[i].instColor.b = tun::Lerp(0.7f, 1.f, (glm::sin(state.time * 1.f) + 1.f) * 0.5f);
-                //gl::state.textParticleData[i].instColor.r = tun::Lerp(1.f, 0.7f, (glm::sin(state.time * 1.f) + 1.f) * 0.5f);
-            //}
         }
     });
 
@@ -242,7 +214,7 @@ void work::DrawFPS() {
     reg.view<FPSComp, TextComp>().each([](TextComp& text) {
         if (sapp_frame_duration() > 0) {
             float fps = 1.f / sapp_frame_duration();
-            text.textOverride = tun::formatToString("FPS: {} - {:.2f}ms - update {:.2f}ms", (int)fps, sapp_frame_duration() * 1000.f, state.updateCycleTime);
+            text.textOverride = formatToString("FPS: {} - {:.2f}ms - update {:.2f}ms", (int)fps, sapp_frame_duration() * 1000.f, tun::updateCycleTime);
         }
     });
 }
@@ -304,7 +276,7 @@ void work::DrawText() {
     auto& pip = apip::text;
     pip.Use();
     pip.bind.samplers[SMP_textSmp] = asampler::text.sampler;
-    pip.bind.images[IMG_fontAtlas] = reg.get<TextureAssetComp>(afont::atlas).image;
+    pip.bind.images[IMG_fontAtlas] = reg.get<TextureAssetComp>(afont::atlas.entity).image;
 
     for (auto [entity, material] : reg.view<TextMaterialComp>().each()) {
         pip.vs.mvp = material.mvp;
@@ -315,20 +287,18 @@ void work::DrawText() {
 
 void work::UpdateTurbulence() {
     for (auto [entity, bounds, material] : reg.view<BoundsComp, TurbulenceMaterialComp>().each()) {
-        material.time = state.time;
+        material.time = tun::time;
         for (auto [entity, character] : reg.view<CharacterComp>().each()) {
-            float gameOverFadeAlpha = tun::Lerp(0.f, 1.f, glm::clamp(state.gameOverFade, 0.f, 8.f) / 8.f);
+            float gameOverFadeAlpha = tun::Lerp(0.f, 1.f, glm::clamp(tun::gameOverFade, 0.f, 8.f) / 8.f);
             material.opacity = tun::CurveAuto(glm::max(glm::max(bounds.fading().time, character.killFading().time), gameOverFadeAlpha));
-            //material.opacity = tun::CurveAuto(bounds.fading().time);
         }
     }
 }
 
 void work::UpdateTurbulenceWorld() {
     for (auto [entity, skybox, material] : reg.view<SkyboxComp, TurbulenceMaterialComp>().each()) {
-        material.time = state.time;
+        material.time = tun::time;
         material.opacity = 1.f;
-        //material.mvp = gl::state.viewProj * glm::scale(Matrix(1.f), Vec(100.f));
         material.mvp = glm::translate(Matrix(1.f), Vec(0.f, 0.f, 0.f));
     }
 }
@@ -347,29 +317,29 @@ void work::UpdateMenu() {
 
         button.clicked = false;
         if (
-            state.normMouseX >= bounds.pos.x - bounds.padding.x &&
-            state.normMouseX <= bounds.pos.x + bounds.size.x + bounds.padding.x * 2.f &&
-            state.normMouseY >= bounds.pos.y - bounds.padding.y &&
-            state.normMouseY <= bounds.pos.y + bounds.size.y + bounds.padding.y * 2.f
+            tun::normMouseX >= bounds.pos.x - bounds.padding.x &&
+            tun::normMouseX <= bounds.pos.x + bounds.size.x + bounds.padding.x * 2.f &&
+            tun::normMouseY >= bounds.pos.y - bounds.padding.y &&
+            tun::normMouseY <= bounds.pos.y + bounds.size.y + bounds.padding.y * 2.f
         ) {
             if (ainput::cursorInteract().started) {
-                if (auto* onClick = button.onClick.Maybe()) {
+                if (auto* onClick = button.onClick.maybe()) {
                     onClick->Start();
                 }
-                auto& soundWhoosh = reg.get<SoundComp>(asound::typing);
+                auto& soundWhoosh = reg.get<SoundComp>(asound::typing.entity);
                 soundWhoosh.Play();
                 button.clicked = true;
             }
         }
     }
 
-    float cursorDeltaX = ainput::moveCursor().started ? reg.get<TwoAxisInputComp>(ainput::moveCursor).value.x : 0.f;
+    float cursorDeltaX = ainput::moveCursor().started ? reg.get<TwoAxisInputComp>(ainput::moveCursor.entity).value.x : 0.f;
 
     for (auto [sliderEntity, slider, button, text, bounds] : reg.view<SliderComp, ButtonComp, TextComp, BoundsComp>().each()) {
         if (!bounds.visible) continue;
 
         if (ainput::cursorInteract().active && slider.handled) {
-            slider.percent += state.deltaTime * cursorDeltaX * 0.05f;
+            slider.percent += tun::deltaTime * cursorDeltaX * 0.05f;
             slider.percent = glm::clamp(slider.percent, slider.minPercent, slider.maxPercent);
             slider.onUpdate().floatValue = slider.percent;
             slider.onUpdate().Start();
@@ -378,7 +348,7 @@ void work::UpdateMenu() {
         }
 
         if (slider.onUpdate().started || aevent::onUpdateLang().started) {
-            text.textOverride = tun::formatToString("{} - {}", text.text->Get(), (int)(slider.percent * 100.f));
+            text.textOverride = formatToString("{} - {}", text.text->Get(), (int)(slider.percent * 100.f));
         }
 
         if (button.clicked) {

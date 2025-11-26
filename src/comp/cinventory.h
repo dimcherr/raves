@@ -10,9 +10,9 @@ struct InventoryComp {
 };
 
 struct InventoryItemComp {
-    Entity inventory {entt::null};
+    Entity inventory {};
     int index {};
-    Thing<TweenComp> inInventory {entt::null};
+    Thing<TweenComp> inInventory {};
     Matrix transform {1.f};
     float scaleAnim {1.f};
 };

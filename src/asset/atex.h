@@ -1,5 +1,4 @@
 #pragma once
-#include "tun/tthing.h"
 #include "comp/crender.h"
 
 namespace atex {

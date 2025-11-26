@@ -10,7 +10,7 @@ Tween::Tween(float speed, TweenComp::Type type) : speed(speed), type(type) {
 }
 
 void CreateTweens() {
-    tun::logpush();
+    tlogpush();
 
     for (auto* tween : tweens) {
         tween->entity = reg.create();
@@ -18,7 +18,7 @@ void CreateTweens() {
         tweenComp.onEnd = tun::CreateEvent();
     }
 
-    tun::logpop("tweens create");
+    tlogpop("tweens create");
 }
 
 }

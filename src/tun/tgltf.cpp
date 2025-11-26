@@ -7,8 +7,6 @@
 #include "ozz/base/maths/simd_math.h"
 #include "ozz/base/maths/vec_float.h"
 #include "tun/tlog.h"
-#include "tun/tanim.h"
-#include "state.h"
 #include "comp/crender.h"
 
 static void Process(gltf::File& file);
@@ -16,24 +14,23 @@ static void ProcessPrimitives(gltf::File& file);
 static void LoadTextures(gltf::File& file);
 static void LoadMaterials(gltf::File& file);
 static void LoadModels(gltf::File& file);
-static void LoadSkins(gltf::File& file);
 static void LoadNodes(gltf::File& file);
 static void LoadPrimitives(gltf::File& file);
 static std::shared_ptr<gltf::Node> LoadNode(gltf::File& file, cgltf_node& node, std::shared_ptr<gltf::Node> parent);
 static void Print(gltf::File& file);
 
 gltf::File::File(StringView path, bool onlyPrimitives) {
-    Bytes fileData {};
-    fileData = tun::ReadFileBinary(path);
+    List<Byte> fileData {};
+    fileData = tfile::readBinary(path);
     cgltf_options options {};
     if (fileData.size() > 0) {
         cgltf_result result = cgltf_parse(&options, (void*)fileData.data(), fileData.size(), &data);
         if (result == cgltf_result_success) {
             StringView jsonData {data->json, data->json_size};
-            tun::WriteFile("glb.json", jsonData);
+            tfile::write("glb.json", jsonData);
             cgltf_result bufres = cgltf_load_buffers(&options, data, path.data());
             if (bufres != cgltf_result_success) {
-                tun::error("GLTF ERROR {}", (int)bufres);
+                terror("GLTF ERROR {}", (int)bufres);
             } else {
                 if (onlyPrimitives) {
                     ProcessPrimitives(*this);
@@ -43,10 +40,10 @@ gltf::File::File(StringView path, bool onlyPrimitives) {
                 return;
             }
         } else {
-            tun::error("GLTF loading Failed {}", (int)result);
+            terror("GLTF loading Failed {}", (int)result);
         }
     }
-    tun::error("GLTF file {} not found", path);
+    terror("GLTF file {} not found", path);
 }
 
 static void ProcessPrimitives(gltf::File& file) {
@@ -57,7 +54,6 @@ static void Process(gltf::File& file) {
     LoadTextures(file);
     LoadMaterials(file);
     LoadModels(file);
-    LoadSkins(file);
     LoadNodes(file);
 }
 
@@ -65,13 +61,12 @@ static void LoadTextures(gltf::File& file) {
     for (int i = 0; i < file.data->textures_count; ++i) {
         auto& texture = file.data->textures[i];
         auto* image = texture.image;
-        //auto& image = file.data->images[i];
         const cgltf_size size = image->buffer_view->size;
         const cgltf_size offset = image->buffer_view->offset;
-        Bytes imageData(size);
+        List<Byte> imageData(size);
         memcpy((void*)imageData.data(), (Byte*)image->buffer_view->buffer->data + offset, size);
 
-        gl::Image img = gl::CreateImageRaw(imageData);
+        sg_image img = gl::CreateImageRaw(imageData);
         file.textures[&texture] = std::make_shared<gltf::Texture>(image->name, img);
     }
 }
@@ -95,58 +90,6 @@ static void LoadMaterials(gltf::File& file) {
     }
 }
 
-static void LoadSkins(gltf::File& file) {
-    for (int i = 0; i < file.data->skins_count; ++i) {
-        SkeletonAssetComp* targetSkeletonComp {};
-        for (auto [skeletonEntity, skeletonComp] : reg.view<SkeletonAssetComp>().each()) {
-            tun::log("SKIN NAME {}", file.data->skins[i].name);
-            tun::log("SKEL NAME {}", skeletonComp.name);
-            if (file.data->skins[i].name == tun::formatToString("{}Skeleton", skeletonComp.name)) {
-                targetSkeletonComp = &skeletonComp;
-                tun::log("SET SKIN TO SKELETON {}", skeletonComp.name);
-                break;
-            }
-        }
-        if (!targetSkeletonComp) {
-            tun::log("NO SKIN FOUND!!!");
-            exit(1);
-        }
-
-        cgltf_accessor* ibm = file.data->skins[i].inverse_bind_matrices;
-        float* ibmPtr = (float*)((Byte*)ibm->buffer_view->buffer->data + ibm->buffer_view->offset + ibm->offset);
-        for (int k = 0; k < ibm->count; ++k) {
-            ozz::math::Float4x4 f {};
-
-            float* col = (float*)&f.cols[0];
-            col[0] = ibmPtr[k * 16];
-            col[1] = ibmPtr[k * 16 + 1];
-            col[2] = ibmPtr[k * 16 + 2];
-            col[3] = ibmPtr[k * 16 + 3];
-
-            col = (float*)&f.cols[1];
-            col[0] = ibmPtr[k * 16 + 4];
-            col[1] = ibmPtr[k * 16 + 5];
-            col[2] = ibmPtr[k * 16 + 6];
-            col[3] = ibmPtr[k * 16 + 7];
-
-            col = (float*)&f.cols[2];
-            col[0] = ibmPtr[k * 16 + 8];
-            col[1] = ibmPtr[k * 16 + 9];
-            col[2] = ibmPtr[k * 16 + 10];
-            col[3] = ibmPtr[k * 16 + 11];
-
-            col = (float*)&f.cols[3];
-            col[0] = ibmPtr[k * 16 + 12]; // x
-            col[1] = ibmPtr[k * 16 + 13]; // y
-            col[2] = ibmPtr[k * 16 + 14]; // z
-            col[3] = ibmPtr[k * 16 + 15]; // w
-
-            targetSkeletonComp->skeleton.meshInverseBindposes.push_back(f);
-            targetSkeletonComp->skeleton.jointNames.push_back(file.data->skins[i].joints[k]->name);
-        }
-    }
-}
-
 static void LoadModels(gltf::File& file) {
     for (int i = 0; i < file.data->meshes_count; ++i) {
         auto& mesh = file.data->meshes[i];
@@ -159,9 +102,6 @@ static void LoadModels(gltf::File& file) {
             cgltf_accessor norm {};
             cgltf_accessor texcoord {};
             cgltf_accessor tangent {};
-            cgltf_accessor jointIndices {};
-            cgltf_accessor jointWeights {};
-            gltfMesh->skinned = false;
             for (int j = 0; j < prim.attributes_count; ++j) {
                 switch (prim.attributes[j].type) {
                     case cgltf_attribute_type_position:
@@ -176,26 +116,16 @@ static void LoadModels(gltf::File& file) {
                     case cgltf_attribute_type_tangent:
                         tangent = *prim.attributes[j].data;
                     break;
-                    case cgltf_attribute_type_joints:
-                        gltfMesh->skinned = true;
-                        jointIndices = *prim.attributes[j].data;
-                    break;
-                    case cgltf_attribute_type_weights:
-                        jointWeights = *prim.attributes[j].data;
-                    break;
                     default:
                     break;
                 }
             }
 
             if (tangent.count == 0) {
-                tun::log("MESH {} IS NOT TRIANGULATED", mesh.name);
+                tlog("MESH {} IS NOT TRIANGULATED", mesh.name);
             }
 
             int dataLen = 12;
-            if (gltfMesh->skinned) {
-                dataLen = 17;
-            }
 
             gltfMesh->vertices.resize(pos.count * dataLen);
 
@@ -203,12 +133,6 @@ static void LoadModels(gltf::File& file) {
             float* normPtr = (float*)((Byte*)norm.buffer_view->buffer->data + norm.buffer_view->offset + norm.offset);
             float* texcoordPtr = (float*)((Byte*)texcoord.buffer_view->buffer->data + texcoord.buffer_view->offset + texcoord.offset);
             float* tangentPtr = (float*)((Byte*)tangent.buffer_view->buffer->data + tangent.buffer_view->offset + tangent.offset);
-            float* jointIndicesPtr = nullptr;
-            float* jointWeightsPtr = nullptr;
-            if (gltfMesh->skinned) {
-                jointIndicesPtr = (float*)((Byte*)jointIndices.buffer_view->buffer->data + jointIndices.buffer_view->offset + jointIndices.offset);
-                jointWeightsPtr = (float*)((Byte*)jointWeights.buffer_view->buffer->data + jointWeights.buffer_view->offset + jointWeights.offset);
-            }
             for (int v = 0; v < pos.count; ++v) {
                 float x = posPtr[v * 3];
                 float y = posPtr[v * 3 + 1];
@@ -226,14 +150,6 @@ static void LoadModels(gltf::File& file) {
                 gltfMesh->vertices[v * dataLen + 9] = tangentPtr[v * 4 + 1];
                 gltfMesh->vertices[v * dataLen + 10] = tangentPtr[v * 4 + 2];
                 gltfMesh->vertices[v * dataLen + 11] = tangentPtr[v * 4 + 3];
-
-                if (gltfMesh->skinned) {
-                    gltfMesh->vertices[v * dataLen + 12] = jointIndicesPtr[v];
-                    gltfMesh->vertices[v * dataLen + 13] = jointWeightsPtr[v * 4];
-                    gltfMesh->vertices[v * dataLen + 14] = jointWeightsPtr[v * 4 + 1];
-                    gltfMesh->vertices[v * dataLen + 15] = jointWeightsPtr[v * 4 + 2];
-                    gltfMesh->vertices[v * dataLen + 16] = jointWeightsPtr[v * 4 + 3];
-                }
             }
 
             gltfMesh->indices.resize(prim.indices->count);
@@ -279,19 +195,18 @@ static std::shared_ptr<gltf::Node> LoadNode(gltf::File& file, cgltf_node& node, 
     if (file.data->nodes_count > 0 && node.extras.start_offset != node.extras.end_offset) {
         char* jsonBuffer = gltf::parse_extras(file.data, &node.extras);
         if (!jsonBuffer) {
-            tun::log("Failed to parse extras for node {}", node.name);
+            tlog("Failed to parse extras for node {}", node.name);
         } else {
             /* Step 3: Parse JSON with cJSON */
             cJSON* json = cJSON_Parse(jsonBuffer);
             if (!json) {
-                tun::log("Failed to parse extras JSON (cJSON) {}", cJSON_GetErrorPtr());
+                tlog("Failed to parse extras JSON (cJSON) {}", cJSON_GetErrorPtr());
                 free(jsonBuffer);
             }
 
             if (cJSON_IsObject(json)) {
                 cJSON* item = json->child;
                 while (item) {
-                    //tun::log("Key {}", item->string);
                     if (cJSON_IsString(item)) {
                         gltfNode->params.strings.push_back({item->string, item->valuestring});
                     } else if (cJSON_IsNumber(item)) {
@@ -304,7 +219,7 @@ static std::shared_ptr<gltf::Node> LoadNode(gltf::File& file, cgltf_node& node, 
             /* Step 4: Get the "category" property */
             cJSON* categoryItem = cJSON_GetObjectItem(json, "category");
             if (!categoryItem) {
-                tun::log("No category key found in extras JSON {}", node.name);
+                tlog("No category key found in extras JSON {}", node.name);
                 cJSON_Delete(json);
                 free(jsonBuffer);
             } else {
@@ -376,35 +291,35 @@ static void LoadPrimitives(gltf::File& file) {
 }
 
 static void Print(gltf::File& file) {
-    tun::log("\n");
+    tlog("\n");
     for (auto& it : file.textures) {
-        tun::log("Texture name={} id={}", it.second->name, it.second->image.id);
+        tlog("Texture name={} id={}", it.second->name, it.second->image.id);
     }
 
-    tun::log("\n");
+    tlog("\n");
     for (auto& it : file.materials) {
-        tun::log("Material name={}", it.second->name);
-        tun::log("\tBaseColor name={}", it.second->baseColorTexture->name);
-        tun::log("\tNormal name={} scale={}", it.second->normalTexture->name, it.second->normalScale);
-        tun::log("\tORM name={} metallicFactor={} roughnessFactor={}", it.second->ormTexture->name, it.second->metallicFactor, it.second->roughnessFactor);
+        tlog("Material name={}", it.second->name);
+        tlog("\tBaseColor name={}", it.second->baseColorTexture->name);
+        tlog("\tNormal name={} scale={}", it.second->normalTexture->name, it.second->normalScale);
+        tlog("\tORM name={} metallicFactor={} roughnessFactor={}", it.second->ormTexture->name, it.second->metallicFactor, it.second->roughnessFactor);
         if (it.second->emissiveTexture) {
-            tun::log("\tEmissive name={} emissiveFactor={}", it.second->emissiveTexture->name, it.second->emissiveFactor);
+            tlog("\tEmissive name={} emissiveFactor={}", it.second->emissiveTexture->name, it.second->emissiveFactor);
         } else {
-            tun::log("\tNo emissive");
+            tlog("\tNo emissive");
         }
     }
-    tun::log("\n");
+    tlog("\n");
 
     for (auto& it : file.models) {
-        tun::log("Model bbmin={} bbmax={} offset={}", it.second->boundingBox.min, it.second->boundingBox.max, it.second->offset);
+        tlog("Model bbmin={} bbmax={} offset={}", it.second->boundingBox.min, it.second->boundingBox.max, it.second->offset);
         for (auto& mesh : it.second->meshes) {
-            tun::log("Mesh vertexCount={} indexCount={} material={}", mesh->vertices.size(), mesh->indices.size(), mesh->material->name);
+            tlog("Mesh vertexCount={} indexCount={} material={}", mesh->vertices.size(), mesh->indices.size(), mesh->material->name);
         }
     }
-    tun::log("\n");
+    tlog("\n");
 
     for (auto& it : file.nodes) {
-        tun::log("Node name={} pos={} rot={} scale={} modelmeshes={} light={}", it->name, it->translation, it->rotation, it->scale, it->model ? it->model->meshes.size() : 0, it->light ? it->light->intensity : 0.f);
+        tlog("Node name={} pos={} rot={} scale={} modelmeshes={} light={}", it->name, it->translation, it->rotation, it->scale, it->model ? it->model->meshes.size() : 0, it->light ? it->light->intensity : 0.f);
     }
 }
 

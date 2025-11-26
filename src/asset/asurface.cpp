@@ -9,7 +9,7 @@ Surface::Surface(StringView name, asound::Sound* stepSound) : name(name), stepSo
 }
 
 void CreateSurfaces() {
-    tun::logpush();
+    tlogpush();
 
     for (auto* surface : surfaces) {
         surface->entity = reg.create();
@@ -17,7 +17,7 @@ void CreateSurfaces() {
         surfaceComp.stepSound = surface->stepSound->entity;
     }
 
-    tun::logpop("surfaces create");
+    tlogpop("surfaces create");
 }
 
 Surface* GetByName(StringView name) {

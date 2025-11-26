@@ -1,7 +1,6 @@
 #pragma once
 #include "sokol_app.h"
 #include "tun/tlist.h"
-#include "tun/tthing.h"
 #include "comp/ccore.h"
 
 namespace ainput {

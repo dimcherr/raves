@@ -1,7 +1,6 @@
 #include "prefab/pui.h"
 #include "comp/canim.h"
 #include "comp/cui.h"
-#include "state.h"
 #include "tags.h"
 #include "data/dtween.h"
 #include "data/dprim.h"
@@ -17,6 +16,7 @@
 #include "work/wcore.h"
 #include "tun/trandom.h"
 #include "tun/tcore.h"
+#include "tun/tcolor.h"
 
 Entity prefab::TextBuffer(Vec offset, Color color, float opacity) {
     Entity entity = reg.create();
@@ -96,8 +96,8 @@ Entity prefab::Button(astring::LocString* text, Vec2 pos2D, Color color, float f
     auto& boundsComp = reg.emplace<BoundsComp>(entity);
 
     auto& buttonComp = reg.emplace<ButtonComp>(entity);
-    buttonComp.color = Vec4(tun::red, 0.75f);
-    buttonComp.colorPressed = Vec4(tun::darkRed, 0.75f);
+    buttonComp.color = Vec4(tcolor::red, 0.75f);
+    buttonComp.colorPressed = Vec4(tcolor::darkRed, 0.75f);
     buttonComp.onClick = onClick;
 
     return entity;
@@ -125,8 +125,8 @@ Entity prefab::Slider(astring::LocString* text, Vec2 pos2D, Color color, float f
     auto& boundsComp = reg.emplace<BoundsComp>(entity);
 
     auto& buttonComp = reg.emplace<ButtonComp>(entity);
-    buttonComp.color = Vec4(tun::red, 0.75f);
-    buttonComp.colorPressed = Vec4(tun::darkRed, 0.75f);
+    buttonComp.color = Vec4(tcolor::red, 0.75f);
+    buttonComp.colorPressed = Vec4(tcolor::darkRed, 0.75f);
     buttonComp.onClick = tun::CreateEvent();
 
     auto& sliderComp = reg.emplace<SliderComp>(entity);
@@ -173,7 +173,7 @@ Entity prefab::Tooltip(Vec2 pos2D) {
     reg.emplace<tag::HUD>(entity);
 
     auto& material = reg.emplace<MaterialTextComp>(entity);
-    material.color = tun::white;
+    material.color = tcolor::white;
     material.opacity = 1.f;
     material.texture = afont::atlas;
 
@@ -183,7 +183,7 @@ Entity prefab::Tooltip(Vec2 pos2D) {
     textComp.fontSize = 72.f;
 
     auto& boundsComp = reg.emplace<BoundsComp>(entity);
-    boundsComp.color = Vec4(tun::black, 0.f);
+    boundsComp.color = Vec4(tcolor::black, 0.f);
 
     auto& layoutComp = reg.emplace<LayoutComp>(entity);
     layoutComp.offset = pos2D;
@@ -197,7 +197,7 @@ Entity prefab::SkipTooltip(Vec2 pos2D) {
     reg.emplace<SkipTooltipComp>(entity);
 
     auto& material = reg.emplace<MaterialTextComp>(entity);
-    material.color = tun::white;
+    material.color = tcolor::white;
     material.opacity = 1.f;
     material.texture = afont::atlas;
 
@@ -207,7 +207,7 @@ Entity prefab::SkipTooltip(Vec2 pos2D) {
     textComp.fontSize = 18.f;
 
     auto& boundsComp = reg.emplace<BoundsComp>(entity);
-    boundsComp.color = Vec4(tun::black, 0.f);
+    boundsComp.color = Vec4(tcolor::black, 0.f);
 
     auto& layoutComp = reg.emplace<LayoutComp>(entity);
     layoutComp.offset = pos2D;
@@ -231,15 +231,15 @@ Entity prefab::Subtitle(astring::LocString* text, bool skippable, int speaker, E
 
     auto& material = reg.emplace<MaterialTextComp>(entity);
     if (speaker == 1) {
-        material.color = tun::gold;
+        material.color = tcolor::gold;
     } else if (speaker == 0) {
-        material.color = tun::white;
+        material.color = tcolor::white;
     } else if (speaker == 2) {
-        material.color = tun::lightGray;
+        material.color = tcolor::lightGray;
     } else if (speaker == 3) {
-        material.color = tun::goldGray;
+        material.color = tcolor::goldGray;
     } else if (speaker == 4) {
-        material.color = tun::goldGray1;
+        material.color = tcolor::goldGray1;
     }
     material.opacity = 1.f;
     material.texture = afont::atlas;
@@ -260,7 +260,7 @@ Entity prefab::Subtitle(astring::LocString* text, bool skippable, int speaker, E
     }
 
     auto& boundsComp = reg.emplace<BoundsComp>(entity);
-    boundsComp.color = Vec4(tun::black, 0.f);
+    boundsComp.color = Vec4(tcolor::black, 0.f);
     boundsComp.visible = false;
 
     auto& layoutComp = reg.emplace<LayoutComp>(entity);

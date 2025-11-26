@@ -5,19 +5,14 @@
 #include "tun/tlist.h"
 #include "tun/tmath.h"
 #include "tun/tfile.h"
+#include "tun/tcolor.h"
 #include "draw.glsl.h"
 
 namespace gl {
 
-using Image = sg_image;
-using Buffer = sg_buffer;
-using Sampler = sg_sampler;
-using Shader = sg_shader;
-using Pipeline = sg_pipeline;
-
 struct DrawData {
-    gl::Buffer vertexBuffer {};
-    gl::Buffer indexBuffer {};
+    sg_buffer vertexBuffer {};
+    sg_buffer indexBuffer {};
     int elementCount {};
 };
 
@@ -25,7 +20,7 @@ struct ParticleData {
     Vec4 instPos {};
     Vec4 instTexcoord {};
     Vec4 instDeform {0.f, 0.f, 1.f, 1.f};
-    Vec4 instColor {tun::white, 1.f};
+    Vec4 instColor {tcolor::white, 1.f};
     Matrix instMVP {1.f};
 };
 
@@ -33,7 +28,7 @@ struct TextParticleData {
     Vec4 instPos {};
     Vec4 instTexcoord {};
     Vec4 instDeform {0.f, 0.f, 1.f, 1.f};
-    Vec4 instColor {tun::white, 1.f};
+    Vec4 instColor {tcolor::white, 1.f};
     Matrix instMVP {1.f};
 };
 
@@ -41,13 +36,13 @@ void UpdateTextParticleBuffer(const sg_bindings& bind, gl::TextParticleData* dat
 void UpdateParticleBuffer(const sg_bindings& bind, gl::ParticleData* data, size_t dataLength);
 
 void Init();
-Buffer CreateVertexBuffer(const List<float>& vertices);
-Buffer CreateVertexBufferTextParticle();
-Buffer CreateVertexBufferParticle();
-Buffer CreateIndexBuffer(const List<uint16_t>& indices);
-Image CreateImageRaw(const Bytes& data);
-Image CreateImageSimpleFromMemory(unsigned char* buffer, int w, int h);
-Image CreateImageSimple(StringView path);
+sg_buffer CreateVertexBuffer(const List<float>& vertices);
+sg_buffer CreateVertexBufferTextParticle();
+sg_buffer CreateVertexBufferParticle();
+sg_buffer CreateIndexBuffer(const List<uint16_t>& indices);
+sg_image CreateImageRaw(const List<Byte>& data);
+sg_image CreateImageSimpleFromMemory(unsigned char* buffer, int w, int h);
+sg_image CreateImageSimple(StringView path);
 
 void BeginLightingPass();
 void BeginGColorPass();

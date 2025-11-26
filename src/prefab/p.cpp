@@ -17,15 +17,16 @@
 #include "tags.h"
 #include "tun/tcore.h"
 #include "tun/tinteract.h"
+#include "tun/tcolor.h"
 #include "work/wsound.h"
 
 void prefab::Game() {
     prefab::MainMenu();
-    prefab::TextBuffer({0.f, 0.f, -0.12f}, tun::white, 1.f);
+    prefab::TextBuffer({0.f, 0.f, -0.12f}, tcolor::white, 1.f);
 
     #if 1
-    prefab::TextBuffer({0.003f, 0.003f, -0.11f}, tun::black, 0.8f);
-    prefab::TextBuffer({0.000f, -0.005f, -0.10f}, tun::black, 0.8f);
+    prefab::TextBuffer({0.003f, 0.003f, -0.11f}, tcolor::black, 0.8f);
+    prefab::TextBuffer({0.000f, -0.005f, -0.10f}, tcolor::black, 0.8f);
     #endif
 
     // HUD
@@ -64,7 +65,7 @@ void prefab::Game() {
     Entity gameOverText = prefab::Text(&astring::gameOverText, {0.5f, 0.5f}, {tun::center, tun::center}, 24.f, Color(1.f, 0.85f, 0.8f));
     reg.emplace<tag::GameOverText>(gameOverText);
 
-    prefab::Button(&astring::play, {0.85f, 0.4f}, tun::white, 72.f, aevent::onPlay);
+    prefab::Button(&astring::play, {0.85f, 0.4f}, tcolor::white, 72.f, aevent::onPlay);
     prefab::Slider(&astring::mouseSense, {0.95f, 0.6f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.5f, 0.1f, 1.f, aevent::onUpdateMouseSense);
     prefab::Slider(&astring::soundVolume, {0.95f, 0.68f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.05f, 0.f, 1.f, aevent::onUpdateSoundVolume);
     prefab::Slider(&astring::musicVolume, {0.95f, 0.76f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.0f, 0.f, 1.f, aevent::onUpdateMusicVolume);
@@ -100,7 +101,7 @@ void prefab::Game() {
         for (auto [musicBoxEntity, musicBoxPart, model] : reg.view<MusicBoxPartComp, ModelComp>().each()) {
             auto& inventoryItem = reg.emplace<InventoryItemComp>(musicBoxEntity);
             inventoryItem.inInventory = tun::CreateTween(3.f, TweenComp::once);
-            reg.get<TweenComp>(inventoryItem.inInventory).delta = 0.f;
+            reg.get<TweenComp>(inventoryItem.inInventory.entity).delta = 0.f;
             inventoryItem.inventory = characterEntity;
 
             //if (musicBoxPart.type != MusicBoxPartComp::base) {
@@ -241,13 +242,13 @@ Entity prefab::MusicBoxPart(const gltf::ModelParams& params) {
 
         String musicBoxType = params.GetStringParam("Type");
         if (musicBoxType == "Blue") {
-            model.tint = tun::blue;
+            model.tint = tcolor::blue;
             partComp.musicBoxType = MusicBoxComp::blue;
         } else if (musicBoxType == "Red") {
-            model.tint = tun::red;
+            model.tint = tcolor::red;
             partComp.musicBoxType = MusicBoxComp::red;
         } else if (musicBoxType == "Green") {
-            model.tint = tun::green;
+            model.tint = tcolor::green;
             partComp.musicBoxType = MusicBoxComp::green;
         }
 

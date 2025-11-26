@@ -14,7 +14,7 @@ Sampler::Sampler(sg_filter filterMin, sg_filter filterMag, sg_filter mipmapFilte
 Sampler::Sampler(sg_filter filter, sg_filter mipmapFilter, sg_wrap wrap, sg_compare_func compare) : Sampler(filter, filter, mipmapFilter, wrap, wrap, compare) {}
 
 void CreateSamplers() {
-    tun::logpush();
+    tlogpush();
 
     for (auto* sampler : samplers) {
         sg_sampler_desc desc {};
@@ -27,7 +27,7 @@ void CreateSamplers() {
         sampler->sampler = sg_make_sampler(desc);
     }
 
-    tun::logpop("samplers create");
+    tlogpop("samplers create");
 }
 
 }

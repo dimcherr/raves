@@ -4,41 +4,18 @@
 #include "data/dinput.h"
 #include "data/dstring.h"
 #include "glm/ext/quaternion_common.hpp"
-#include "state.h"
 #include "comp/cphys.h"
 #include "comp/cui.h"
 #include "comp/crender.h"
 #include "comp/cinventory.h"
 #include "comp/cinput.h"
+#include "tun/tun.h"
 #include "tun/tcore.h"
 #include "tun/tmath.h"
+#include "tun/tcolor.h"
 #include "data/dsound.h"
 
 void work::UpdateInteract() {
-    greenSwitch.update();
-    yellowSwitch.update();
-    purpleSwitch.update();
-
-    for (auto [switchEntity, switchComp, modelComp, transformComp, bodyComp] : reg.view<SwitchComp, ModelComp, TransformComp, BodyComp>().each()) {
-        float val = 0.f;
-        if (switchComp.type == "Green") {
-            modelComp.tint = tun::green;
-            val = greenSwitch.value;
-        } else if (switchComp.type == "Yellow") {
-            modelComp.tint = tun::yellow;
-            val = yellowSwitch.value;
-        } else if (switchComp.type == "Purple") {
-            modelComp.tint = tun::purple;
-            val = purpleSwitch.value;
-        }
-
-        float pitch = tun::Lerp(0.f, tun::pi * 0.5f, tun::CurveAuto(val));
-        transformComp.rotation = transformComp.baseRotation * Quat({pitch, 0.f, 0.f});
-        transformComp.dirty = true;
-        //tun::log("transform rotation {} world {}", transformComp.rotation, transformComp.worldRotation);
-        phys::state->physicsSystem.GetBodyInterface().SetRotation(bodyComp.id, Convert(transformComp.worldRotation), JPH::EActivation::Activate);
-    }
-
     for (auto [itemEntity, inventoryItem] : reg.view<InventoryItemComp>().each()) {
         if (inventoryItem.inInventory().onEnd().started) {
             asound::pickUp().Play();
@@ -46,7 +23,7 @@ void work::UpdateInteract() {
     }
 
     for (auto [characterEntity, character, characterTransform, camera, inventory] : reg.view<CharacterComp, TransformComp, CameraComp, InventoryComp>().each()) {
-        character.timeSinceInteract += state.deltaTime;
+        character.timeSinceInteract += tun::deltaTime;
 
         if (auto* raycastComp = reg.try_get<RaycastComp>(character.interactionRaycast)) {
             if (raycastComp->onHit().started) {
@@ -61,7 +38,7 @@ void work::UpdateInteract() {
                     interactable->onHover().time = 1.f;
                     interactable->onHover().delta = -1.f;
                 }
-                character.interactable = entt::null;
+                character.interactable = {};
             }
         }
 
@@ -71,25 +48,25 @@ void work::UpdateInteract() {
                 material.opacity = tun::CurveAuto(interactable->onHover().time);
                 if (auto* switchComp = reg.try_get<SwitchComp>(interactable->parentBody)) {
                     if (ainput::interact().started && character.timeSinceInteract > 0.15f) {
-                        SwitchState* ss {};
-                        if (switchComp->type == "Green") {
-                            ss = &greenSwitch;
-                        } else if (switchComp->type == "Yellow") {
-                            ss = &yellowSwitch;
-                        } else if (switchComp->type == "Purple") {
-                            ss = &purpleSwitch;
-                        }
+                        //SwitchState* ss {};
+                        //if (switchComp->type == "Green") {
+                            //ss = &greenSwitch;
+                        //} else if (switchComp->type == "Yellow") {
+                            //ss = &yellowSwitch;
+                        //} else if (switchComp->type == "Purple") {
+                            //ss = &purpleSwitch;
+                        //}
 
-                        tun::log("switch type {}", switchComp->type);
+                        //tun::log("switch type {}", switchComp->type);
 
-                        if (ss) {
-                            tun::log("FOUND SS");
-                            if (ss->value > 0.5f) {
-                                ss->delta = -1.f;
-                            } else {
-                                ss->delta = 1.f;
-                            }
-                        }
+                        //if (ss) {
+                            //tun::log("FOUND SS");
+                            //if (ss->value > 0.5f) {
+                                //ss->delta = -1.f;
+                            //} else {
+                                //ss->delta = 1.f;
+                            //}
+                        //}
                     }
                 }
             } else {
@@ -102,7 +79,7 @@ void work::UpdateInteract() {
                 float charSpeed = character.moving ? character.speed : 0.f;
                 float charSpeedT = glm::clamp(charSpeed, 0.f, 10.f) / 10.f;
 
-                float alpha = glm::clamp(state.deltaTime * 20.f, 0.f, 1.f);
+                float alpha = glm::clamp(tun::deltaTime * 20.f, 0.f, 1.f);
                 weaponTransform->scale = Vec(0.5f);
                 weaponTransform->rotation = glm::slerp(weaponTransform->rotation, Quat({0.f, camera.yaw + tun::pi * 0.1f, 0.f}), alpha);
                 //weaponTransform->rotation = glm::slerp(weaponTransform->rotation, characterTransform.rotation, alpha);
@@ -126,7 +103,7 @@ void work::UpdateInteract() {
                 );
             }
 
-            weapon->timeSinceChange += state.deltaTime;
+            weapon->timeSinceChange += tun::deltaTime;
             if (weapon->timeSinceChange > 1.f) {
                 weapon->timeSinceChange = 1.f;
             }
@@ -138,7 +115,7 @@ void work::UpdateInteract() {
                     if (reg.valid(weapon->weaponModel)) {
                         currentIndex = reg.get<InventoryItemComp>(weapon->weaponModel).index + 1;
                     }
-                    auto& scrollInput = reg.get<ScrollInputComp>(ainput::changeMusicBox);
+                    auto& scrollInput = reg.get<ScrollInputComp>(ainput::changeMusicBox.entity);
 
                     if (scrollInput.value > 0.f) {
                         currentIndex = (currentIndex + (itemsCount + 1) + 1) % (itemsCount + 1);
@@ -148,7 +125,7 @@ void work::UpdateInteract() {
 
                     if (auto* inventoryItem = reg.try_get<InventoryItemComp>(weapon->weaponModel)) {
                         inventoryItem->inInventory().delta = 1.f;
-                        weapon->weaponModel = entt::null;
+                        weapon->weaponModel = {};
                     }
 
                     if (currentIndex > 0) {
@@ -168,7 +145,7 @@ void work::UpdateInteract() {
 
                         if (auto* inventoryItem = reg.try_get<InventoryItemComp>(weapon->weaponModel)) {
                             inventoryItem->inInventory().delta = 1.f;
-                            weapon->weaponModel = entt::null;
+                            weapon->weaponModel = {};
                         }
 
                         if (!same) {

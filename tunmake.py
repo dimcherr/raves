@@ -77,14 +77,15 @@ def addLists(f, lists):
 
 def addCompileRule(f):
     f.write("\nrule compile\n")
-    f.write("  command = $compiler -MD -MF $out.d -c $in -o $out $includes $defines $cflags\n")
-    f.write("  description = COMPILING $out\n")
+    f.write("  command = $compiler -MD -MF $out.d -c $in -o $out $includes $defines $cflags -fdiagnostics-color=always -fno-diagnostics-show-caret -fno-diagnostics-show-option -fno-diagnostics-show-labels -fno-diagnostics-show-template-tree -fno-elide-type\n")
+    f.write("  description = >> $in\n")
+    #f.write("  pool = console\n")
     f.write("  depfile = $out.d\n")
 
 def addLinkRule(f):
     f.write("\nrule link\n")
     f.write("  command = $compiler @$out.rsp -o $out $lflags $libs\n")
-    f.write("  description = LINKING $out\n")
+    f.write("  description = >> $in\n")
     f.write("  rspfile = $out.rsp\n")
     f.write("  rspfile_content = $in\n")
 

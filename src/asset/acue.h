@@ -15,11 +15,11 @@ struct Subtitle : Thing<SubtitleComp> {
     bool skippable {};
     Speaker speaker {};
     aevent::Event* eventOnSkip {};
-    Entity nextSubtitle {entt::null};
+    Entity nextSubtitle {};
     float time {};
 
-    Subtitle(astring::LocString* text, bool skippable = false, Speaker speaker = Speaker::me, aevent::Event* eventOnSkip = nullptr, Entity nextSubtitle = entt::null, float time = 0.25f);
-    Subtitle(const List<StringView>& strings, bool skippable = false, Speaker speaker = Speaker::me, aevent::Event* eventOnSkip = nullptr, Entity nextSubtitle = entt::null, float time = 0.25f);
+    Subtitle(astring::LocString* text, bool skippable = false, Speaker speaker = Speaker::me, aevent::Event* eventOnSkip = nullptr, Entity nextSubtitle = {}, float time = 0.25f);
+    Subtitle(const List<StringView>& strings, bool skippable = false, Speaker speaker = Speaker::me, aevent::Event* eventOnSkip = nullptr, Entity nextSubtitle = {}, float time = 0.25f);
 };
 
 struct Cue : Thing<SubtitleComp> {

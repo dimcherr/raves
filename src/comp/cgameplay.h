@@ -1,7 +1,5 @@
 #pragma once
-#include "state.h"
 #include "tun/tmath.h"
-#include "tun/tthing.h"
 #include "asset/astring.h"
 #include "comp/canim.h"
 

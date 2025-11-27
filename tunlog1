@@ -1,21 +1,21 @@
 SOBAKA
 game start
-    [1.607ms]: phys init
-    [3.487ms]: gl init
-    [42.577ms]: sound init
-  [47.750ms]: game init
+    [1.365ms]: phys init
+    [2.872ms]: gl init
+    [22.142ms]: sound init
+  [26.440ms]: game init
     [0.032ms]: events create
     [0.018ms]: tweens create
-    [0.077ms]: inputs create
-    [0.078ms]: cues create
-    [33.844ms]: sounds create
-    [0.118ms]: samplers create
-    [3.506ms]: pips create
-    [0.905ms]: prims create
-    [3.832ms]: textures create
-    [95.823ms]: fonts create
-    [0.018ms]: surfaces create
-  [138.334ms]: asset create
+    [0.074ms]: inputs create
+    [0.095ms]: cues create
+    [33.835ms]: sounds create
+    [0.100ms]: samplers create
+    [3.287ms]: pips create
+    [0.748ms]: prims create
+    [4.100ms]: textures create
+    [101.197ms]: fonts create
+    [0.019ms]: surfaces create
+  [143.607ms]: asset create
       No category key found in extras JSON Walls.004
       No category key found in extras JSON Walls.003
       No category key found in extras JSON Walls.002
@@ -46,10 +46,10 @@ game start
       No category key found in extras JSON DecorLightStand.002
       No category key found in extras JSON DecorLightStand.003
       No category key found in extras JSON DecorLightStand.004
-    [376.339ms]: gltf parse
-    [0.024ms]: textures load
-    [0.014ms]: materials load
-    [13.302ms]: models load
+    [381.621ms]: gltf parse
+    [0.021ms]: textures load
+    [0.013ms]: materials load
+    [12.751ms]: models load
       MODEL Cube HAS NO PBR MATERIAL
       MODEL checkpoint0 HAS NO PBR MATERIAL
       MODEL Cube.058 HAS NO PBR MATERIAL
@@ -71,8 +71,8 @@ game start
       MODEL checkpoint2.006 HAS NO PBR MATERIAL
       MODEL Cube.066 HAS NO PBR MATERIAL
       MODEL checkpoint2.007 HAS NO PBR MATERIAL
-    [0.356ms]: nodes load
-  [391.154ms]: scene load
-  [0.070ms]: common objects load
-  [0.123ms]: game load
-[577.439ms]: game create
+    [0.387ms]: nodes load
+  [396.175ms]: scene load
+  [0.076ms]: common objects load
+  [0.133ms]: game load
+[566.442ms]: game create

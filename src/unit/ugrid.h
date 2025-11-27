@@ -10,7 +10,10 @@ struct CMaterialGrid {
 };
 
 struct TGrid : Thing<CMesh> {
-    TGrid(int segmentCount = 100, const Color& color = tcolor::black, float opacity = 1.f, const Vec& pos = tmath::vecZero);
+    TGrid(int segmentCount = 100,
+          const Color& color = tcolor::black,
+          float opacity = 1.f,
+          const Vec& pos = tmath::vecZero);
 };
 
 struct UGrid : Unit {
@@ -40,3 +43,4 @@ struct UGrid : Unit {
 };
 
 inline UGrid* ugrid {};
+

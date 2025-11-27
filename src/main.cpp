@@ -4,7 +4,8 @@
 #include "sokol_time.h"
 #include "stb_image.h"
 #include "stb_image_resize2.h"
-#include "tun/tgl.h"
+#include "tun/tlist.h"
+#include "tun/tlog.h"
 
 sapp_desc sokol_main(int argc, char* argv[]) {
     stm_setup();
@@ -15,7 +16,7 @@ sapp_desc sokol_main(int argc, char* argv[]) {
     desc.init_cb = &game::create;
     desc.frame_cb = &game::update;
     desc.cleanup_cb = &game::destroy;
-    desc.event_cb = &game::onEvent;
+    desc.event_cb = &game::event;
 
     float ratio = 1920 / 1080.f;
     desc.width = 1517;
@@ -56,3 +57,4 @@ sapp_desc sokol_main(int argc, char* argv[]) {
 
     return desc;
 }
+

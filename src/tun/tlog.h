@@ -47,3 +47,4 @@ inline void tlogpop(std::format_string<Args...> fmt, Args&&... args) {
     }
     std::cout << formatToString("[{:.3f}ms]: ", stm_ms(stm_diff(newTicks, trace.ticks))) << std::vformat(fmt.get(), std::make_format_args(args...)) << std::endl;
 }
+

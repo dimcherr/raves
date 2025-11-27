@@ -77,21 +77,19 @@ def addLists(f, lists):
 
 def addCompileRule(f):
     f.write("\nrule compile\n")
-    f.write("  command = $compiler -MD -MF $out.d -c $in -o $out $includes $defines $cflags -fdiagnostics-color=always -fno-diagnostics-show-caret -fno-diagnostics-show-option -fno-diagnostics-show-labels -fno-diagnostics-show-template-tree -fno-elide-type\n")
+    f.write("  command = $compiler -MD -MF $out.d -c $in -o $out $includes $defines $cflags\n")
     f.write("  description = >> $in\n")
-    #f.write("  pool = console\n")
     f.write("  depfile = $out.d\n")
 
 def addLinkRule(f):
     f.write("\nrule link\n")
     f.write("  command = $compiler @$out.rsp -o $out $lflags $libs\n")
-    f.write("  description = >> $in\n")
+    f.write("  description = LINKING $in\n")
     f.write("  rspfile = $out.rsp\n")
     f.write("  rspfile_content = $in\n")
 
 def addZipRule(f, zipTargets, projectName, targetDir):
     f.write("\nrule zip\n")
-    #f.write("  command = cd {}/{} && $zipper a -tzip $out {}\n".format(targetDir, projectName, " ".join(zipTargets)))
     f.write("  command = bash scripts/zip.sh {}\n".format(projectName))
     f.write("  description = PACKAGING $out\n")
     f.write("build {}output/{}.zip: zip {}output/{}/index.html\n".format(rootdir, projectName, rootdir, projectName))

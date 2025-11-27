@@ -43,12 +43,6 @@ struct Unit {
 inline List<Unit*> units {};
 
 template <typename T>
-void addUnit(T*& ptr) {
-    ptr = new T();
-    units.push_back(ptr);
-}
-
-template <typename T>
 struct Thing {
     Entity entity {};
 

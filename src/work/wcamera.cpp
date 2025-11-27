@@ -12,25 +12,25 @@
 #include "tun/trender.h"
 
 void work::UpdateCamera() {
-    for (auto [cameraEntity, camera, transform] : reg.view<tag::Current, CameraComp, TransformComp>().each()) {
+    for (auto [cameraEntity, camera, transform] : reg.view<tag::Current, CCamera, TransformComp>().each()) {
         tun::UpdateCamera(camera, tun::screenWidth, tun::screenHeight);
         transform.rotation = Quat({camera.pitch, camera.yaw, 0.f});
         transform.dirty = true;
 
         gl::state.view = tun::LookAt(transform.translation + camera.offset, transform.rotation);
-        gl::state.viewProj = camera.projection * gl::state.view;
+        gl::state.viewProj = camera.proj * gl::state.view;
         gl::state.viewPos = transform.translation + camera.offset;
     }
 
-    for (auto [characterEntity, character, camera, transform] : reg.view<CharacterComp, CameraComp, TransformComp>().each()) {
+    for (auto [characterEntity, character, camera, transform] : reg.view<CharacterComp, CCamera, TransformComp>().each()) {
         Matrix view = tun::LookAt(transform.translation + camera.offset, transform.rotation);
-        Matrix localViewProj = camera.projection * view;
+        Matrix localViewProj = camera.proj * view;
         gl::state.frustum = tun::ExtractFrustumPlanes(camera.fovy, tun::screenRatio, camera.znear, camera.zfar, localViewProj, view);
     }
 }
 
 void work::UpdateCameraMovement() {
-    auto [camera, transform] = reg.get<CameraComp, TransformComp>(reg.view<tag::Current, CameraComp, TransformComp>().back());
+    auto [camera, transform] = reg.get<CCamera, TransformComp>(reg.view<tag::Current, CCamera, TransformComp>().back());
 
     Vec deltaMovement {};
     if (ainput::flyForward().active) {
@@ -60,7 +60,7 @@ void work::UpdateCameraMovement() {
 }
 
 void work::UpdateCameraRotation() {
-    for (auto [cameraEntity, camera] : reg.view<CameraComp, tag::Current>().each()) {
+    for (auto [cameraEntity, camera] : reg.view<CCamera, tag::Current>().each()) {
         float sense = camera.rotationSensitivity;
         #ifdef OS_WEB
         sense *= 0.5f;

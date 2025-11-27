@@ -19,6 +19,7 @@
 #include "comp/cui.h"
 #include "comp/c.h"
 #include "tun/tmath.h"
+#include "unit/ucamera.h"
 #include "work/wmodel.h"
 
 void work::DrawLighting(const Vec& lightPos, const Quat& lightRotation, const Vec4& lightColor) {
@@ -56,7 +57,7 @@ void work::DrawAmbience() {
 
     pip.fs.ambientFactor = 0.005f;
     pip.fs.time = tun::gameTime;
-    for (auto [cameraEntity, camera, character] : reg.view<CameraComp, CharacterComp>().each()) {
+    for (auto [cameraEntity, camera, character] : reg.view<CCamera, CharacterComp>().each()) {
         pip.fs.yaw = camera.yaw;
     }
     pip.vs.mvp = Matrix(1.f);

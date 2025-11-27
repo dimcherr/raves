@@ -4,6 +4,7 @@
 #include "comp/ccore.h"
 #include "comp/crender.h"
 #include "tun/tcore.h"
+#include "unit/ucamera.h"
 
 Entity prefab::Grid(int segmentCount, const Color& color) {
     float scale = segmentCount;
@@ -35,7 +36,7 @@ Entity prefab::CameraFly(const Vec& position, const Vec& target) {
     Entity entity = reg.create();
     reg.emplace<tag::Fly>(entity);
 
-    auto& camera = reg.emplace<CameraComp>(entity);
+    auto& camera = reg.emplace<CCamera>(entity);
     camera.pitch = angles.x;
     camera.yaw = angles.y;
     camera.znear = 0.1f;

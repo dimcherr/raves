@@ -4,6 +4,7 @@
 #include "comp/crender.h"
 #include "comp/cphys.h"
 #include "data/dinput.h"
+#include "unit/ucamera.h"
 #include "work/wmodel.h"
 #include "tun/tun.h"
 #include "tun/tcore.h"
@@ -45,10 +46,10 @@ static void ToggleDebugView() {
 }
 
 static void ToggleFlyCamera() {
-    Entity fly = reg.view<tag::Fly, CameraComp>().back();
-    Entity firstPerson = reg.view<tag::FirstPerson, CameraComp>().back();
+    Entity fly = reg.view<tag::Fly, CCamera>().back();
+    Entity firstPerson = reg.view<tag::FirstPerson, CCamera>().back();
 
-    auto& flyCamera = reg.get<CameraComp>(fly);
+    auto& flyCamera = reg.get<CCamera>(fly);
     flyCamera.minPitch = -60.f;
     flyCamera.maxPitch = 60.f;
     flyCamera.minYaw = 0.f;
@@ -71,8 +72,8 @@ static void ToggleFlyCamera() {
 static void TeleportPlayerToFlyCamera() {
     if (!tun::flyMode || tun::paused) return;
 
-    for (auto [characterEntity, character, characterCamera] : reg.view<CharacterComp, CameraComp>().each()) {
-        for (auto [flyCameraEntity, flyCamera, flyCameraTransform] : reg.view<CameraComp, TransformComp, tag::Fly>().each()) {
+    for (auto [characterEntity, character, characterCamera] : reg.view<CharacterComp, CCamera>().each()) {
+        for (auto [flyCameraEntity, flyCamera, flyCameraTransform] : reg.view<CCamera, TransformComp, tag::Fly>().each()) {
             character.character->SetPosition(Convert(flyCameraTransform.translation));
             characterCamera.pitch = flyCamera.pitch;
             characterCamera.yaw = flyCamera.yaw;

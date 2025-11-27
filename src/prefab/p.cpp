@@ -16,9 +16,9 @@
 #include "data/dsound.h"
 #include "tags.h"
 #include "tun/tcore.h"
-#include "tun/tinteract.h"
 #include "tun/tcolor.h"
 #include "work/wsound.h"
+#include "unit/uinteract.h"
 
 void prefab::Game() {
     prefab::MainMenu();
@@ -223,7 +223,7 @@ Entity prefab::Switch(const gltf::ModelParams& params) {
     Entity entity = prefab::PickableBody(params);
     auto& model = reg.get<ModelComp>(params.entity);
     auto& switchComp = reg.emplace<SwitchComp>(entity);
-    switchComp.interactable = tun::CreateInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);
+    switchComp.interactable = uinteract.createInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);
     switchComp.type = params.GetStringParam("Type");
     return entity;
 } 
@@ -238,7 +238,7 @@ Entity prefab::MusicBoxPart(const gltf::ModelParams& params) {
         auto& partComp = reg.emplace<MusicBoxPartComp>(entity);
 
         partComp.inHandModelName = inHandModelName;
-        partComp.interactable = tun::CreateInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);
+        partComp.interactable = uinteract.createInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);
 
         String musicBoxType = params.GetStringParam("Type");
         if (musicBoxType == "Blue") {
@@ -283,6 +283,7 @@ Entity prefab::Checkpoint(const gltf::ModelParams& params) {
     reg.get<TransformComp>(params.entity).dirty = true;
     return params.entity;
 }
+
 
 Entity prefab::CheckpointVolume(const gltf::ModelParams& params) {
     prefab::StaticBody(params);

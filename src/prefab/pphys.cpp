@@ -15,6 +15,7 @@
 #include "tun/tcore.h"
 #include "asset/asurface.h"
 #include "data/dinput.h"
+#include "unit/ucamera.h"
 
 Entity prefab::StaticBody(const gltf::ModelParams& params) {
     BoxShapeComp& assetBoxShape = reg.get<BoxShapeComp>(params.modelAsset);
@@ -163,7 +164,7 @@ Entity prefab::Character() {
     character.gameOvering = tun::CreateTween(1.f, TweenComp::Type::once);
     character.gameOvering().delta = 0.f;
 
-    auto& camera = reg.emplace<CameraComp>(entity);
+    auto& camera = reg.emplace<CCamera>(entity);
     camera.znear = 0.1f;
     camera.zfar = 1000.f;
     camera.bobbingIntensity = 0.01f;

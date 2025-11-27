@@ -1,9 +1,13 @@
-#include "tun/tinteract.h"
+#include "unit/uinteract.h"
+#include "comp/cinteract.h"
 #include "comp/cphys.h"
 #include "tun/tcore.h"
-#include "tun/tphys.h"
 
-Thing<InteractableComp> tun::CreateInteractable(Entity parentEntity, const Vec& position, float radius) {
+void UInteract::update() {
+
+}
+
+Thing<InteractableComp> UInteract::createInteractable(Entity parentEntity, const Vec& position, float radius) {
     Thing<InteractableComp> interactable {};
     interactable.entity = reg.create();
     auto& interactableComp = reg.emplace<InteractableComp>(interactable.entity);
@@ -24,3 +28,4 @@ Thing<InteractableComp> tun::CreateInteractable(Entity parentEntity, const Vec& 
 
     return interactable;
 }
+

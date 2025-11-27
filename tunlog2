@@ -1,0 +1,78 @@
+SOBAKA
+game start
+    [1.258ms]: phys init
+    [3.615ms]: gl init
+    [23.039ms]: sound init
+  [27.973ms]: game init
+    [0.034ms]: events create
+    [0.016ms]: tweens create
+    [0.080ms]: inputs create
+    [0.079ms]: cues create
+    [34.018ms]: sounds create
+    [0.078ms]: samplers create
+    [3.149ms]: pips create
+    [0.813ms]: prims create
+    [3.952ms]: textures create
+    [94.738ms]: fonts create
+    [0.014ms]: surfaces create
+  [137.052ms]: asset create
+      No category key found in extras JSON Walls.004
+      No category key found in extras JSON Walls.003
+      No category key found in extras JSON Walls.002
+      No category key found in extras JSON Walls.001
+      No category key found in extras JSON Walls
+      No category key found in extras JSON VinylPlatform
+      No category key found in extras JSON SwitchBase
+      No category key found in extras JSON Switch
+      No category key found in extras JSON SmallPlatform
+      No category key found in extras JSON SimplePlatform
+      No category key found in extras JSON FlyingDisco
+      No category key found in extras JSON DoorBlock
+      No category key found in extras JSON DJBox
+      No category key found in extras JSON Cube.073
+      No category key found in extras JSON Cube.074
+      No category key found in extras JSON Cube.075
+      No category key found in extras JSON Cube.076
+      No category key found in extras JSON Cube.077
+      No category key found in extras JSON Cube.078
+      No category key found in extras JSON Cube.079
+      No category key found in extras JSON Cube.080
+      No category key found in extras JSON Cube.081
+      No category key found in extras JSON Cube.082
+      No category key found in extras JSON CirclePlatform
+      No category key found in extras JSON Balka
+      No category key found in extras JSON DecorLightStand
+      No category key found in extras JSON DecorLightStand.001
+      No category key found in extras JSON DecorLightStand.002
+      No category key found in extras JSON DecorLightStand.003
+      No category key found in extras JSON DecorLightStand.004
+    [379.039ms]: gltf parse
+    [0.027ms]: textures load
+    [0.018ms]: materials load
+    [13.463ms]: models load
+      MODEL Cube HAS NO PBR MATERIAL
+      MODEL checkpoint0 HAS NO PBR MATERIAL
+      MODEL Cube.058 HAS NO PBR MATERIAL
+      MODEL Cube.057 HAS NO PBR MATERIAL
+      MODEL checkpoint1 HAS NO PBR MATERIAL
+      MODEL Cube.059 HAS NO PBR MATERIAL
+      MODEL checkpoint2 HAS NO PBR MATERIAL
+      MODEL Cube.060 HAS NO PBR MATERIAL
+      MODEL checkpoint2.001 HAS NO PBR MATERIAL
+      MODEL Cube.061 HAS NO PBR MATERIAL
+      MODEL checkpoint2.002 HAS NO PBR MATERIAL
+      MODEL Cube.062 HAS NO PBR MATERIAL
+      MODEL checkpoint2.003 HAS NO PBR MATERIAL
+      MODEL Cube.063 HAS NO PBR MATERIAL
+      MODEL checkpoint2.004 HAS NO PBR MATERIAL
+      MODEL Cube.064 HAS NO PBR MATERIAL
+      MODEL checkpoint2.005 HAS NO PBR MATERIAL
+      MODEL Cube.065 HAS NO PBR MATERIAL
+      MODEL checkpoint2.006 HAS NO PBR MATERIAL
+      MODEL Cube.066 HAS NO PBR MATERIAL
+      MODEL checkpoint2.007 HAS NO PBR MATERIAL
+    [0.393ms]: nodes load
+  [394.100ms]: scene load
+  [0.064ms]: common objects load
+  [0.122ms]: game load
+[559.322ms]: game create

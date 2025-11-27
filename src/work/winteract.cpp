@@ -14,6 +14,7 @@
 #include "tun/tmath.h"
 #include "tun/tcolor.h"
 #include "data/dsound.h"
+#include "unit/ucamera.h"
 
 void work::UpdateInteract() {
     for (auto [itemEntity, inventoryItem] : reg.view<InventoryItemComp>().each()) {
@@ -22,7 +23,9 @@ void work::UpdateInteract() {
         }
     }
 
-    for (auto [characterEntity, character, characterTransform, camera, inventory] : reg.view<CharacterComp, TransformComp, CameraComp, InventoryComp>().each()) {
+    for (auto [characterEntity, character, characterTransform, camera, inventory] : 
+            reg.view<CharacterComp, TransformComp, CCamera, InventoryComp>().each()) {
+
         character.timeSinceInteract += tun::deltaTime;
 
         if (auto* raycastComp = reg.try_get<RaycastComp>(character.interactionRaycast)) {

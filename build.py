@@ -22,7 +22,7 @@ sounds = []
 res = {}
 strings["name"] = "{}{}{}".format(name, platform.capitalize(), config.capitalize())
 strings["bin"] = "build/{}/{}".format(platform, config)
-lists["defines"] = tun.defines("RAUDIO_STANDALONE SUPPORT_FILEFORMAT_OGG SUPPORT_MODULE_RAUDIO")
+lists["defines"] = tun.defines("RAUDIO_STANDALONE SUPPORT_FILEFORMAT_OGG SUPPORT_MODULE_RAUDIO _CRT_SECURE_NO_WARNINGS")
 lists["includes"] = []
 lists["libs"] = []
 lists["cflags"] = ["-std=c++20", "-Wno-ignored-attributes"]

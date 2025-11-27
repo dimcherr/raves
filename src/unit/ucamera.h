@@ -36,10 +36,8 @@ struct CCamera {
 
 struct UCamera : Unit {
     void update() override;
-    bool isInFrustum(Entity entity);
-
-    Thing<CCamera> screenCamera {};
+    bool isInFrustum(Entity entity, const CCamera& ccamera);
 };
 
-inline UCamera* ucamera {};
+inline UCamera& ucamera {*new UCamera()};
 

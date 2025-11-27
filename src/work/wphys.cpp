@@ -16,12 +16,15 @@
 #include "tun/tphys.h"
 #include "tun/tcore.h"
 #include "tun/tsound.h"
+#include "unit/ucamera.h"
 
 void work::UpdatePhysics() {
     const int collisionSteps = 2;
     phys::state->physicsSystem.Update(tun::deltaTime, collisionSteps, &phys::state->tempAllocator, &phys::state->jobSystem);
 
-    for (auto [characterEntity, character, transform, shape, camera] : reg.view<CharacterComp, TransformComp, CapsuleShapeComp, CameraComp, tag::Current>().each()) {
+    for (auto [characterEntity, character, transform, shape, camera] :
+            reg.view<CharacterComp, TransformComp, CapsuleShapeComp, CCamera, tag::Current>().each()) {
+
         if (!character.character) {
             JPH::CharacterVirtualSettings settings {};
             settings.mShape = new JPH::CapsuleShape(shape.halfHeight, shape.radius);
@@ -29,7 +32,12 @@ void work::UpdatePhysics() {
             settings.mMaxSlopeAngle = character.maxSlopeAngle;
             settings.mMaxStrength = character.maxStrength;
             settings.mSupportingVolume = JPH::Plane(JPH::Vec3::sAxisY(), -shape.halfHeight);
-            character.character = new JPH::CharacterVirtual(&settings, Convert(transform.translation), Convert(transform.rotation), &phys::state->physicsSystem);
+            character.character = new JPH::CharacterVirtual(
+                &settings,
+                Convert(transform.translation),
+                Convert(transform.rotation),
+                &phys::state->physicsSystem
+            );
             character.character->SetListener(&phys::state->characterContactListener);
         } else {
             if (!tun::firstPerson) {
@@ -353,7 +361,7 @@ void work::UpdatePhysics() {
 }
 
 void work::UpdateRaycast() {
-    for (auto [entity, character, camera, transform] : reg.view<CharacterComp, CameraComp, TransformComp>().each()) {
+    for (auto [entity, character, camera, transform] : reg.view<CharacterComp, CCamera, TransformComp>().each()) {
         phys::Raycast(
             reg.get<RaycastComp>(character.interactionRaycast), 
             transform.translation + camera.offset, 

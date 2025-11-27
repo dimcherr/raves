@@ -322,6 +322,7 @@ void work::UpdateMenu() {
             tun::normMouseY >= bounds.pos.y - bounds.padding.y &&
             tun::normMouseY <= bounds.pos.y + bounds.size.y + bounds.padding.y * 2.f
         ) {
+
             if (ainput::cursorInteract().started) {
                 if (auto* onClick = button.onClick.maybe()) {
                     onClick->Start();

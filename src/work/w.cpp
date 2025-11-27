@@ -19,11 +19,11 @@
 #include "comp/c.h"
 #include "comp/cinventory.h"
 #include "work/wcamera.h"
+#include "unit/ucamera.h"
 
 static void UpdateSubtitles();
 static void UpdateDoors();
 static void UpdatePlatforms();
-static void UpdatePlayer();
 static void UpdateMusicBox();
 static void UpdateKillZ();
 
@@ -32,13 +32,12 @@ void work::UpdateGame() {
         UpdateSubtitles();
         UpdateDoors();
         UpdatePlatforms();
-        UpdatePlayer();
         UpdateMusicBox();
     }
     UpdateKillZ();
 
     if (tun::gameOver) {
-        for (auto [characterEntity, character, transform, body, camera] : reg.view<CharacterComp, TransformComp, BodyComp, CameraComp>().each()) {
+        for (auto [characterEntity, character, transform, body, camera] : reg.view<CharacterComp, TransformComp, BodyComp, CCamera>().each()) {
             tun::gameOverFade += tun::deltaTime * 0.3125f;
             camera.yaw += tun::deltaTime * 0.3125f;
             if (camera.yaw > tun::pi * 2.f) {
@@ -74,6 +73,7 @@ static void UpdateMusicBox() {
 
             model.active = false;
             part.interactable().active = false;
+
 
             inventoryItem = basePartInventoryItem;
             // TODO FOR ANIMATION
@@ -291,20 +291,6 @@ static void UpdateMusicBox() {
     }
 }
 
-static void UpdatePlayer() {
-    //if (ainput::respawn().started) {
-        //for (auto [entity, character, body, transform, camera] : reg.view<CharacterComp, BodyComp, TransformComp, CameraComp>().each()) {
-            //for (auto [entity, spawnTransform] : reg.view<SpawnPointCharacterComp, TransformComp>().each()) {
-                //transform = spawnTransform;
-                //character.character->SetPosition(Convert(transform.translation));
-                //character.character->SetRotation(Convert(transform.rotation));
-                //camera.yaw = 0.f;
-                //camera.pitch = 0.f;
-            //}
-        //}
-    //}
-}
-
 static void UpdatePlatforms() {
     for (auto [characterEntity, character] : reg.view<CharacterComp>().each()) {
         for (auto [entity, platform, transform, body, model] : reg.view<PlatformComp, TransformComp, BodyComp, ModelComp>().each()) {
@@ -437,7 +423,7 @@ void work::PlaySubtitle(Entity entity) {
 }
 
 static void UpdateKillZ() {
-    for (auto [characterEntity, character, transform, body, camera] : reg.view<CharacterComp, TransformComp, BodyComp, CameraComp>().each()) {
+    for (auto [characterEntity, character, transform, body, camera] : reg.view<CharacterComp, TransformComp, BodyComp, CCamera>().each()) {
         if (character.killFading().onEnd().started) {
             if (character.killFading().time >= 1.f) {
                 character.killFading().time = 1.f;

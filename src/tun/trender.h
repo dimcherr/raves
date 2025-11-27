@@ -1,8 +1,9 @@
 #pragma once
 #include "comp/crender.h"
+#include "unit/ucamera.h"
 
 namespace tun {
 
-void UpdateCamera(CameraComp& camera, float screenWidth, float screenHeight);
+void UpdateCamera(CCamera& camera, float screenWidth, float screenHeight);
 
 }

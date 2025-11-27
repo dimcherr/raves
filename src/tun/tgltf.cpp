@@ -3,9 +3,6 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/quaternion_transform.hpp"
 #include "glm/matrix.hpp"
-#include "ozz/base/maths/internal/simd_math_config.h"
-#include "ozz/base/maths/simd_math.h"
-#include "ozz/base/maths/vec_float.h"
 #include "tun/tlog.h"
 #include "comp/crender.h"
 

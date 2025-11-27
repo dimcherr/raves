@@ -27,10 +27,10 @@ void UCamera::update() {
     }
 }
 
-bool UCamera::isInFrustum(Entity entity) {
-    if (reg.any_of<BoxShapeComp>(entity) && screenCamera) {
+bool UCamera::isInFrustum(Entity entity, const CCamera& ccamera) {
+    if (reg.any_of<BoxShapeComp>(entity)) {
         auto& boxShapeComp = reg.get<BoxShapeComp>(entity);
-        return tun::IsBoundingBoxInFrustum(boxShapeComp.transformedBoundingBox, screenCamera().frustum);
+        return tun::IsBoundingBoxInFrustum(boxShapeComp.transformedBoundingBox, ccamera.frustum);
     }
     return true;
 }

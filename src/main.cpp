@@ -18,7 +18,7 @@ sapp_desc sokol_main(int argc, char* argv[]) {
     desc.event_cb = &game::OnEvent;
     desc.width = 1920;
     desc.height = 1080;
-    desc.sample_count = 0;
+    desc.sample_count = 1;
     desc.fullscreen = false;
     desc.window_title = "Raves";
     desc.logger.func = slog_func;

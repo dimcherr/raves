@@ -80,7 +80,7 @@ struct State {
 
     static constexpr int maxParticles = 2048;
     static constexpr int maxTextCharacters = 2048;
-    static constexpr int nativeResolution {480};
+    static constexpr int nativeResolution {1080};
 
     Matrix view {1.f};
     Matrix viewProj {1.f};

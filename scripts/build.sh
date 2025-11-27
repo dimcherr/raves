@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -e
-
 start=$(date +%s%3N)
 
 echo "PREPARE..."

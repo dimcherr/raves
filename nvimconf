@@ -104,7 +104,7 @@ require("lazy").setup({
                     --},
                     keymap = {
                         recommended = true,
-                        manual_complete = "<C-j>",
+                        manual_complete = "<C-f>",
                         pre_select = true,
                     },
                     auto_start = true, -- if you want to start COQ at startup
@@ -407,14 +407,7 @@ vim.keymap.set("n", "<A-o>", switch_source_header, {
   desc = "Switch between .cpp and .h"
 })
 
-
-
---vim.o.makeprg = "bash scripts/build.sh Raves Win Release"
 function RunApp()
-    os.remove("output/RavesWinRelease.exe")
-    ToggleQuickfix()
-    vim.cmd("AsyncRun bash scripts/build.sh Raves Win Release")
-
     vim.api.nvim_create_autocmd("User", {
         pattern = "AsyncRunStop",
         once = true,
@@ -422,7 +415,11 @@ function RunApp()
             local qflist = vim.fn.getqflist()
             local filtered = vim.tbl_filter(function(item)
                 local name = vim.fn.bufname(item.bufnr)
-                return item.lnum and item.lnum > 0 and item.col and item.col > 0 and name and name:match("src")
+                if item.valid and item.lnum == 0 and not name:match("src") then
+                    name = "src/" .. name
+                    item.bufnr = vim.fn.bufnr(name, true)
+                end
+                return ((item.lnum and item.lnum > 0 and item.col and item.col > 0) or (item.valid and item.valid > 0)) and name and name:match("src")
             end, qflist)
             vim.fn.setqflist(filtered, 'r')
 
@@ -431,25 +428,15 @@ function RunApp()
             else
                 CloseQuickfix()
 
-                local logs = { "tunlog1", "tunlog2", "tunlog3" }
-                for i = #logs, 2, -1 do
-                    local old = logs[i - 1]
-                    local new = logs[i]
-                    if vim.fn.filereadable(old) == 1 then
-                        os.rename(old, new)
-                    end
-                end
-                -- Make sure latest log is empty
-                local latest_log = logs[1]
-                if vim.fn.filereadable(latest_log) == 1 then
-                    os.remove(latest_log)
+                local logfile = "tunlog"
+                if vim.fn.filereadable(logfile) == 1 then
+                    os.remove(logfile)
                 end
 
                 vim.cmd("tabnew")
-                local term_cmd = string.format("bash -c './scripts/run.sh RavesWinRelease.exe | tee %s'", latest_log)
+                local term_cmd = string.format("bash -c './scripts/run.sh RavesWinRelease.exe | tee %s'", logfile)
                 local term_buf = vim.api.nvim_get_current_buf()
                 vim.fn.termopen(term_cmd)
-                --vim.cmd("term bash scripts/run.sh RavesWinRelease.exe | tee %s'")
                 vim.cmd("normal! G")
                 vim.api.nvim_create_autocmd("TermClose", {
                     buffer = term_buf,
@@ -461,6 +448,11 @@ function RunApp()
             end
         end
     })
+
+    os.remove("output/RavesWinRelease.exe")
+    ToggleQuickfix()
+    vim.cmd("AsyncRun bash scripts/build.sh Raves Win Release")
+
 end
 
 function RunLint()
@@ -483,5 +475,9 @@ vim.api.nvim_create_autocmd('LspRequest', {
       print("lsp complete")
     end
   end,
+})
+
+vim.opt.errorformat:append({
+    [[%*[^:]:%*[^:]:%*[^:]:%f:%m]],
 })
 

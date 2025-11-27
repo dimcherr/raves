@@ -24,7 +24,7 @@ sapp_desc sokol_main(int argc, char* argv[]) {
     desc.window_x = 1920 - desc.width - 8;
     desc.window_y = 140;
 
-    desc.sample_count = 0;
+    desc.sample_count = 1;
     desc.fullscreen = false;
     desc.window_title = "Raves";
     desc.logger.func = slog_func;

@@ -129,7 +129,7 @@ struct std::formatter<Matrix> : std::formatter<std::string> {
     }
 };
 
-namespace tmath {
+namespace tun {
 
 enum Anchor {
     begin,

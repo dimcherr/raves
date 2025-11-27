@@ -7,6 +7,5 @@
 namespace prefab {
 
 Entity Grid(int segmentCount = 200, const Color& color = tcolor::black);
-Entity CameraFly(const Vec& position, const Vec& target);
 
 }

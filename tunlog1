@@ -1,21 +1,21 @@
 SOBAKA
 game start
-    [1.357ms]: phys init
-    [3.604ms]: gl init
-    [52.316ms]: sound init
-  [57.407ms]: game init
-    [0.030ms]: events create
-    [0.013ms]: tweens create
-    [0.058ms]: inputs create
-    [0.067ms]: cues create
-    [34.577ms]: sounds create
-    [0.096ms]: samplers create
-    [13.916ms]: pips create
-    [0.750ms]: prims create
-    [5.078ms]: textures create
-    [110.576ms]: fonts create
-    [0.013ms]: surfaces create
-  [165.275ms]: asset create
+    [1.607ms]: phys init
+    [3.487ms]: gl init
+    [42.577ms]: sound init
+  [47.750ms]: game init
+    [0.032ms]: events create
+    [0.018ms]: tweens create
+    [0.077ms]: inputs create
+    [0.078ms]: cues create
+    [33.844ms]: sounds create
+    [0.118ms]: samplers create
+    [3.506ms]: pips create
+    [0.905ms]: prims create
+    [3.832ms]: textures create
+    [95.823ms]: fonts create
+    [0.018ms]: surfaces create
+  [138.334ms]: asset create
       No category key found in extras JSON Walls.004
       No category key found in extras JSON Walls.003
       No category key found in extras JSON Walls.002
@@ -46,10 +46,10 @@ game start
       No category key found in extras JSON DecorLightStand.002
       No category key found in extras JSON DecorLightStand.003
       No category key found in extras JSON DecorLightStand.004
-    [390.635ms]: gltf parse
-    [0.016ms]: textures load
-    [0.011ms]: materials load
-    [12.780ms]: models load
+    [376.339ms]: gltf parse
+    [0.024ms]: textures load
+    [0.014ms]: materials load
+    [13.302ms]: models load
       MODEL Cube HAS NO PBR MATERIAL
       MODEL checkpoint0 HAS NO PBR MATERIAL
       MODEL Cube.058 HAS NO PBR MATERIAL
@@ -71,8 +71,8 @@ game start
       MODEL checkpoint2.006 HAS NO PBR MATERIAL
       MODEL Cube.066 HAS NO PBR MATERIAL
       MODEL checkpoint2.007 HAS NO PBR MATERIAL
-    [0.311ms]: nodes load
-  [404.895ms]: scene load
-  [0.040ms]: common objects load
-  [0.118ms]: game load
-[627.744ms]: game create
+    [0.356ms]: nodes load
+  [391.154ms]: scene load
+  [0.070ms]: common objects load
+  [0.123ms]: game load
+[577.439ms]: game create

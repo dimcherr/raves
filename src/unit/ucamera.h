@@ -34,6 +34,8 @@ struct CCamera {
     bool inLowState {false};
 };
 
+Entity PCameraFly(const Vec& position, const Vec& target);
+
 struct UCamera : Unit {
     void update() override;
     bool isInFrustum(Entity entity, const CCamera& ccamera);

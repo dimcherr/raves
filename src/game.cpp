@@ -50,6 +50,7 @@
 #include "data/dsound.h"
 #include "asset/atween.h"
 #include "data/dinput.h"
+#include "unit/ucamera.h"
 
 #ifdef OS_WEB
 EMSCRIPTEN_KEEPALIVE
@@ -116,7 +117,7 @@ void game::create() {
         tlogpush();
             prefab::Grid();
             prefab::Character();
-            prefab::CameraFly(reg.get<TransformComp>(reg.view<CharacterComp>().back()).translation, tun::vecZero);
+            PCameraFly(reg.get<TransformComp>(reg.view<CharacterComp>().back()).translation, tun::vecZero);
         tlogpop("common objects load");
 
         tlogpush();
@@ -315,5 +316,4 @@ void game::onEvent(const sapp_event* event) {
             break;
     }
 }
-
 

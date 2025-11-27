@@ -31,21 +31,3 @@ Entity prefab::Grid(int segmentCount, const Color& color) {
     return entity;
 }
 
-Entity prefab::CameraFly(const Vec& position, const Vec& target) {
-    const Vec2 angles = tun::LookAtPitchYaw(position, target);
-    Entity entity = reg.create();
-    reg.emplace<tag::Fly>(entity);
-
-    auto& camera = reg.emplace<CCamera>(entity);
-    camera.pitch = angles.x;
-    camera.yaw = angles.y;
-    camera.znear = 0.1f;
-    camera.zfar = 1000.f;
-    
-    auto& transform = reg.emplace<TransformComp>(entity);
-    transform.entity = entity;
-    transform.translation = position;
-
-
-    return entity;
-}

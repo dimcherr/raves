@@ -1,11 +1,9 @@
 #include "tun/tphys.h"
 #include <cstdarg>
 #include "Jolt/Core/IssueReporting.h"
-#include "comp/cphys.h"
 #include "tun/tlog.h"
-#include "tun/tcore.h"
 
-static void TraceImpl(const char *inFMT, ...) {
+static void trace(const char *inFMT, ...) {
 	va_list list;
 	va_start(list, inFMT);
 	char buffer[1024];
@@ -14,21 +12,17 @@ static void TraceImpl(const char *inFMT, ...) {
 }
 
 #ifdef JPH_ENABLE_ASSERTS
-
-static bool AssertFailedImpl(const char *inExpression, const char *inMessage, const char *inFile, unsigned int inLine) {
+static bool assertFailed(const char *inExpression, const char *inMessage, const char *inFile, unsigned int inLine) {
     tlog("JPH ASSERT {} {} {} {}", inExpression, inMessage != nullptr ? inMessage : "", inFile, inLine);
 	return true; // DON'T Trigger breakpoint
 };
-
 #endif
 
-void phys::Init(void(*onTrigger)(JPH::BodyID)) {
-    tlogpush();
-
-    JPH::Trace = &TraceImpl;
+void phys::init(void(*onTrigger)(JPH::BodyID)) {
+    JPH::Trace = &trace;
 
     #ifdef JPH_ENABLE_ASSERTS
-    JPH::AssertFailed = &AssertFailedImpl;
+    JPH::AssertFailed = &assertFailed;
     #endif
 
     JPH::RegisterDefaultAllocator();
@@ -44,21 +38,17 @@ void phys::Init(void(*onTrigger)(JPH::BodyID)) {
         phys::state->maxContactConstraints,
         phys::state->broadPhaseLayerInterface,
         phys::state->objectVsBroadphaseLayerFilter,
-        phys::state->objectVsObjectLayerFilter
-    );
+        phys::state->objectVsObjectLayerFilter);
 
 	phys::state->physicsSystem.SetBodyActivationListener(&phys::state->bodyActivationListener);
 	phys::state->physicsSystem.SetContactListener(&phys::state->contactListener);
     phys::state->onTrigger = onTrigger;
-
-    tlogpop("phys init");
 }
 
 void phys::OnCharacterContactStart(JPH::BodyID bodyID) {
     auto* body = phys::state->physicsSystem.GetBodyLockInterface().TryGetBody(bodyID);
     if (body && body->IsSensor()) {
         phys::state->onTrigger(bodyID);
-        // TODO sensor detection for character
     }
 }
 
@@ -97,46 +87,3 @@ bool phys::AreBodiesIntersecting(JPH::BodyID bodyID1, JPH::BodyID bodyID2) {
     return collector.bodyID == bodyID2;
 }
 
-void phys::Raycast(RaycastComp& raycastComp, const Vec& start, const Vec& direction) {
-    raycastComp.start = start;
-    const Vec ray = direction * raycastComp.maxDistance;
-    JPH::RRayCast raycast(Convert(start), Convert(ray));
-    JPH::RayCastResult hit {};
-    bool hasHit = phys::state->physicsSystem.GetNarrowPhaseQuery().CastRay(
-        raycast, 
-        hit, 
-        phys::state->characterBroadPhaseLayerFilter,
-        phys::state->interactableRaycastObjectFilter,
-        phys::state->characterBodyFilter 
-    );
-
-    if (hasHit) {
-        JPH::BodyID bodyID = hit.mBodyID;
-        for (auto [bodyEntity, body] : reg.view<BodyComp>().each()) {
-            if (bodyID == body.id) {
-                bool isHitNew = bodyEntity != raycastComp.body;
-                auto& bodyTransform = reg.get<TransformComp>(bodyEntity);
-                raycastComp.body = bodyEntity;
-                raycastComp.end = raycastComp.start + ray * hit.mFraction;
-                if (isHitNew) {
-                    raycastComp.onHit().Start();
-                }
-                break;
-            }
-        }
-    } else {
-        if (reg.valid(raycastComp.body)) {
-            raycastComp.onHit().Stop();
-            raycastComp.body = {};
-        }
-    }
-}
-
-RaycastComp* phys::GetRaycast(Entity object, Entity raycast) {
-    if (auto* raycastComp = reg.try_get<RaycastComp>(raycast))  {
-        if (raycastComp->body == object) {
-            return raycastComp;
-        }
-    }
-    return nullptr;
-}

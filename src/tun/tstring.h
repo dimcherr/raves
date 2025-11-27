@@ -5,7 +5,8 @@
 using String = std::string;
 using StringView = std::string_view;
 
-StringView TrimLeft(StringView sv);
-StringView TrimRight(StringView sv);
-StringView Trim(StringView sv);
-StringView Substring(StringView sv, float percent);
+StringView trimLeft(StringView sv);
+StringView trimRight(StringView sv);
+StringView trim(StringView sv);
+StringView substring(StringView sv, float percent);
+

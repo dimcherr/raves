@@ -271,7 +271,7 @@ struct State {
 
 inline State* state {};
 
-void Init(void(*onTrigger)(JPH::BodyID));
+void init(void(*onTrigger)(JPH::BodyID));
 bool AreBodiesIntersecting(JPH::BodyID bodyID1, JPH::BodyID bodyID2);
 void Raycast(RaycastComp& raycastComp, const Vec& start, const Vec& direction);
 RaycastComp* GetRaycast(Entity object, Entity raycast);

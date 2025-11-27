@@ -13,10 +13,10 @@ sapp_desc sokol_main(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
     sapp_desc desc {};
-    desc.init_cb = &game::create;
-    desc.frame_cb = &game::update;
-    desc.cleanup_cb = &game::destroy;
-    desc.event_cb = &game::event;
+    desc.init_cb = game::create;
+    desc.frame_cb = game::update;
+    desc.cleanup_cb = game::destroy;
+    desc.event_cb = game::event;
 
     float ratio = 1920 / 1080.f;
     desc.width = 1517;

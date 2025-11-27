@@ -1,5 +1,4 @@
 #include "tun/tmath.h"
-#include "comp/ccore.h"
 #include "glm/common.hpp"
 #include "glm/gtc/matrix_access.hpp"
 

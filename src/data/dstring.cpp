@@ -20,7 +20,7 @@ LocString mouseSense {"Mouse sensitivity", "Чувствительность м�
 LocString soundVolume {"Sound volume", "Громкость звуков"};
 LocString musicVolume {"Music volume", "Громкость музыки"};
 
-LocString pick {"(E) Take", "(E) Взять"};
+LocString pick {"(E) Use", "(E) Использовать"};
 LocString open {"[E] Open", "[E] Открыть"};
 LocString unlock {"[E] Open", "[E] Открыть"};
 LocString drop {"[E] Drop", "[E] Бросить"};
@@ -31,6 +31,9 @@ LocString putGoldenTree {"[E] Put statue", "[E] Поставить статуэ�
 LocString talk {"[E] Talk", "[E] Выслушать"};
 LocString give {"[E] Give", "[E] Отдать"};
 LocString look {"[E] Look", "[E] Осмотреть"};
+
+LocString turnOn {"(E) Turn ON", "(E) ВКЛ"};
+LocString turnOff {"(E) Turn OFF", "(E) ВЫКЛ"};
 
 LocString tooltipPlaceholder {"...", "..."};
 LocString clickToContinueWithTab {"Press [Tab] if you need to pause the game.", "Нажми [Tab], если нужно поставить на паузу."};

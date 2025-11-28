@@ -70,23 +70,6 @@ static void OnTrigger(JPH::BodyID bodyID) {
                 if (volume.index > character.checkpointIndex) {
                     character.checkpointIndex = volume.index;
                     character.checkpoint = volume.checkpoint;
-
-                    if (character.checkpointIndex == 1) {
-                        work::PlaySubtitle(acue::firstRoomExit);
-                    } else if (character.checkpointIndex == 4) {
-                        work::PlaySubtitle(acue::firstHallway);
-                    } else if (character.checkpointIndex == 8) {
-                        work::PlaySubtitle(acue::secondHallway);
-                    }
-
-                    // TODO NEW CHECKPOINT EVENT
-                    if (character.checkpointIndex >= 9.f && character.gameOvering().time == 0.f) {
-                        // TRIGGER GAME OVER EVENT
-                        character.gameOvering().time = 0.0001f;
-                        character.gameOvering().delta = 1.f;
-                        character.killFading().time = 0.0001f;
-                        character.killFading().delta = 1.f;
-                    }
                 }
                 break;
             }

@@ -59,34 +59,6 @@ void work::UpdateGame() {
 }
 
 static void UpdateMusicBox() {
-    for (auto [entity, part, transform, body, inventoryItem, model] : reg.view<MusicBoxPartComp, TransformComp, BodyComp, InventoryItemComp, ModelComp>().each()) {
-        if (part.completed && part.type != MusicBoxPartComp::base) {
-            auto& musicBox = reg.get<MusicBoxComp>(part.musicBox);
-            auto& basePartTransform = reg.get<TransformComp>(musicBox.base);
-            auto& basePartInventoryItem = reg.get<InventoryItemComp>(musicBox.base);
-
-            transform = basePartTransform;
-            if (part.type == MusicBoxPartComp::crank) {
-                transform.rotation *= Quat({glm::fract(musicBox.windingPercent) * tun::pi * 2.f, 0.f, 0.f});
-            } else if (part.type == MusicBoxPartComp::statue) {
-                transform.rotation *= Quat({0.f, glm::fract(musicBox.windingPercent) * tun::pi * 2.f, 0.f});
-            }
-
-            tun::UpdateTransform(entity);
-            auto& bodyInterface = phys::state->physicsSystem.GetBodyInterface();
-            bodyInterface.SetPositionAndRotation(
-                body.id,
-                Convert(transform.translation),
-                Convert(transform.rotation),
-                JPH::EActivation::Activate
-            );
-
-            model.active = false;
-            part.interactable().active = false;
-
-            inventoryItem = basePartInventoryItem;
-        }
-    }
 }
 
 static void UpdatePlayer() {
@@ -95,12 +67,21 @@ static void UpdatePlayer() {
 static void UpdatePlatforms() {
     for (auto [characterEntity, character] : reg.view<CharacterComp>().each()) {
         for (auto [entity, platform, transform, body, model] : reg.view<PlatformComp, TransformComp, BodyComp, ModelComp>().each()) {
-            if (platform.musicBoxType == MusicBoxComp::yellow) {
-                model.tint = tun::yellow;
-            } else if (platform.musicBoxType == MusicBoxComp::green) {
-                model.tint = tun::green;
-            } else if (platform.musicBoxType == MusicBoxComp::purple) {
-                model.tint = tun::purple;
+            platform.winding = 0.f;
+            if (auto* tween = platform.switchState->turnedOn.Maybe()) {
+                platform.winding = tween->time;
+            }
+
+            if (platform.winding < 0.5f) {
+                model.tint = tun::white;
+            } else {
+                if (platform.musicBoxType == MusicBoxComp::yellow) {
+                    model.tint = tun::yellow;
+                } else if (platform.musicBoxType == MusicBoxComp::green) {
+                    model.tint = tun::green;
+                } else if (platform.musicBoxType == MusicBoxComp::purple) {
+                    model.tint = tun::purple;
+                }
             }
 
             Vec prevTranslation = transform.translation;
@@ -109,7 +90,6 @@ static void UpdatePlatforms() {
             // Update transform based on lerp
             auto& endTransform = reg.get<TransformComp>(platform.end);
 
-            platform.winding = 1.f;
             platform.linearTime += state.deltaTime * platform.speed * platform.winding;
             if (platform.linearTime > 2.f) {
                 platform.linearTime -= 2.f;
@@ -173,10 +153,6 @@ static void UpdateDoors() {
 }
 
 static void UpdateSubtitles() {
-    if (state.gameTime > 1.5f && !acue::firstRoom().played) {
-        work::PlaySubtitle(acue::firstRoom);
-    }
-
     if (ainput::skipSub().started) {
         if (reg.valid(state.currentSubtitle)) {
             auto& sub = reg.get<SubtitleComp>(state.currentSubtitle);

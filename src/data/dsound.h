@@ -15,5 +15,6 @@ extern Sound boo;
 extern Sound windUp;
 extern Sound pickUp;
 extern Sound completeMusicBox;
+extern Sound lightswitch;
 
 }

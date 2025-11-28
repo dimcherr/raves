@@ -14,5 +14,6 @@ Sound boo           {"boo",             4,      1.f};
 Sound windUp           {"windUp", 1.f};
 Sound pickUp           {"chimes", 1.f};
 Sound completeMusicBox           {"coinsOut", 3, 1.f};
+Sound lightswitch {"lightswitch", 1.f};
 
 }

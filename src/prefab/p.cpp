@@ -124,7 +124,7 @@ Entity prefab::PlatformStart(const gltf::ModelParams& params) {
     auto& platformComp = reg.emplace<PlatformComp>(entity);
     platformComp.endName = params.GetStringParam("End");
 
-    platformComp.speed = params.GetFloatParam("Speed") * 0.3f;
+    platformComp.speed = params.GetFloatParam("Speed") * 2.f;
     platformComp.offset = glm::clamp(params.GetFloatParam("Offset"), 0.f, 1.f);
     platformComp.time = platformComp.offset;
     platformComp.linearTime = platformComp.time;

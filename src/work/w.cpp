@@ -90,17 +90,28 @@ static void UpdatePlatforms() {
             // Update transform based on lerp
             auto& endTransform = reg.get<TransformComp>(platform.end);
 
-            platform.linearTime += state.deltaTime * platform.speed * platform.winding;
-            if (platform.linearTime > 2.f) {
-                platform.linearTime -= 2.f;
-            } else if (platform.linearTime < 0.f) {
-                platform.linearTime += 2.f;
+
+
+
+
+            float lt = platform.switchState->linearTime + platform.offset;
+            if (lt < 0.f) {
+                lt += 2.f;
+            } else if (lt > 2.f) {
+                lt -= 2.f;
             }
-            if (platform.linearTime <= 1.f) {
-                platform.time = platform.linearTime;
+
+
+            lt = fmodf(lt * platform.speed, 2.f);
+
+            if (lt <= 1.f) {
+                platform.time = lt;
             } else {
-                platform.time = 2.f - platform.linearTime;
+                platform.time = 2.f - lt;
             }
+
+
+
 
             float rawTime = glm::clamp(platform.time, 0.f, 1.f);
             float t = tun::CurveAuto(rawTime);

@@ -68,6 +68,10 @@ void work::UpdateInteract() {
         }
     }
 
+    greenSwitchState.update();
+    yellowSwitchState.update();
+    purpleSwitchState.update();
+
     for (auto [entity, switchStick, transform, body] : reg.view<SwitchStickComp, TransformComp, BodyComp>().each()) {
         if (reg.valid(switchStick.switchState->turnedOn.entity)) {
             if (switchStick.switchState->turnedOn().active) {

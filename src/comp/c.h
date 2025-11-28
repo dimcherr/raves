@@ -4,9 +4,62 @@
 #include "comp/cinteract.h"
 #include "tun/tmath.h"
 
+// Sine-based smoothing
+inline float sineSmooth(float t) {
+    return 0.5f - 0.5f * cosf(t * 3.14159265f);
+}
+
+// Map linearTime (0..2) to smoothed 0..1 with N beats
+// moveRatio: fraction of each beat used for movement (0..1)
+inline float beatTime(float linearTime, int numBeats = 4, float moveRatio = 0.8f) {
+    // Normalize 0..2 -> 0..1
+    float t = fmodf(linearTime, 2.f) / 2.f;
+
+    float beatLength = 1.f / numBeats;
+    float beatPos = t * numBeats;             // 0..numBeats
+    int beatIndex = int(beatPos);            // current beat
+    float localT = beatPos - beatIndex;      // 0..1 inside beat
+
+    // Split each beat into move and pause
+    float moveEnd = moveRatio;               // 0..moveRatio fraction is moving
+    float smoothT;
+    if (localT < moveEnd) {
+        // moving phase (scaled to 0..1)
+        smoothT = localT / moveEnd;
+        //smoothT = sineSmooth(smoothT);       // smooth easing
+    } else {
+        // pause phase (stay at end of beat)
+        smoothT = 1.f;
+    }
+
+    // Map to global 0..1 range
+    float start = float(beatIndex) / numBeats;
+    float end   = float(beatIndex + 1) / numBeats;
+
+    return start + (end - start) * smoothT;
+}
+
+
 struct SwitchState {
     Thing<TweenComp> turnedOn {};
+    float realTime {};
     float linearTime {};
+
+    void update() {
+        if (auto* tween = turnedOn.Maybe()) {
+            realTime += state.deltaTime * tween->time;
+            if (realTime > 2.f) {
+                realTime -= 2.f;
+            } else if (realTime < 0.f) {
+                realTime += 2.f;
+            }
+            //linearTime = realTime;
+
+            // x-x-x-x-x
+
+            linearTime = beatTime(realTime, 16, 0.8f);
+        }
+    }
 };
 
 inline SwitchState greenSwitchState {};

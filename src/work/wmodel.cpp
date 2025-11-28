@@ -26,7 +26,6 @@ void work::LoadScene() {
         {"Floor", prefab::Surface},
         {"PlatformStart", prefab::PlatformStart},
         {"PlatformEnd", prefab::PlatformEnd},
-        {"MusicBox", prefab::MusicBoxPart},
         {"Switch", prefab::Switch},
         {"SwitchStick", prefab::SwitchStick},
 

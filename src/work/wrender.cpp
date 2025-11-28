@@ -202,70 +202,9 @@ void work::DrawGColor() {
 
         if (state.gameOver && inventoryItem) continue;
 
-        if (inventoryItem && !state.paused && !state.gameOver) {
-            for (auto [inventoryEntity, inventory] : reg.view<InventoryComp>().each()) {
-                if (inventoryItem->inventory == inventoryEntity) {
-                    for (auto [characterEntity, character, characterTransform] : reg.view<CharacterComp, TransformComp>().each()) {
-                        float left = -0.5f;
-                        float right = 0.5f;
-                        float padding = 0.09f;
-
-                        if (inventory.inventoryIndex == 0) {
-                            left = -0.35f;
-                            right = 0.4f;
-                            padding = 0.15f;
-                        }
-
-                        float slotWidth = ((right - left) / (float)inventory.maxCount) - padding;
-                        float x = tun::Lerp(left, right, inventoryItem->index / (float)inventory.maxCount);
-                        float y = inventory.offset;
-                        float scale = slotWidth * inventoryItem->scaleAnim;
-                        auto& boxShapeComp = reg.get<BoxShapeComp>(mesh.model);
-                        scale /= boxShapeComp.size.x;
-                        Vec scaleVec = Vec(1.f, state.screenRatio, 1.f) * scale;
-
-                        Vec pos = gl::state.viewPos + boxShapeComp.offset;
-
-                        float auxPitch = {0.f};
-                        float auxYaw = {0.f};
-                        if (auto* musicBoxPart = reg.try_get<MusicBoxPartComp>(mesh.model)) {
-                            auto& musicBox = reg.get<MusicBoxComp>(musicBoxPart->musicBox);
-                            if (musicBoxPart->type == MusicBoxPartComp::crank) {
-                                auxPitch = glm::fract(musicBox.windingPercent) * tun::pi * 2.f;
-                            } else if (musicBoxPart->type == MusicBoxPartComp::statue) {
-                                auxYaw = glm::fract(musicBox.windingPercent) * tun::pi * 2.f;
-                            }
-                        }
-
-                        Matrix t = glm::translate(Matrix(1.f), pos + characterTransform.rotation * tun::forward);
-                        Matrix r = glm::mat4_cast(characterTransform.rotation);
-
-                        Matrix rr = glm::mat4_cast(Quat({-tun::pi * 0.1f, -tun::pi * 0.1f, 0.f}) * Quat({auxPitch, auxYaw, 0.f}));
-
-                        Matrix s = glm::scale(Matrix(1.f), scaleVec);
-                        static Matrix ss = glm::scale(Matrix(1.f), Vec(1.f, 1.f, 0.1f));
-                        static Matrix tt = Matrix(1.f);
-                        if (inventory.inventoryIndex == 1) {
-                            tt = glm::translate(Matrix(1.f), Vec(x + boxShapeComp.size.x * scaleVec.x * 0.5f - boxShapeComp.offset.x * scaleVec.x, y + boxShapeComp.size.y * scaleVec.y * (0.f) - boxShapeComp.offset.y * scaleVec.y, -0.9f));
-                        } else {
-                            tt = glm::translate(Matrix(1.f), Vec(x, y, -0.9f));
-                        }
-
-                        float alpha = tun::CurveAuto(reg.get<TweenComp>(inventoryItem->inInventory).time);
-                        Matrix scaledT = glm::scale(transform.transform, Vec(inventoryItem->scaleAnim));
-                        Matrix m = tun::Lerp(scaledT, t * r * rr * s, alpha);
-
-                        pip.vs.mvp = tun::Lerp(gl::state.viewProj * scaledT, ss * tt * rr * s, alpha);
-                        pip.vs.matModel = m;
-                        pip.vs.matNormal = glm::transpose(glm::inverse(m));
-                    }
-                }
-            }
-        } else {
-            pip.vs.mvp = gl::state.viewProj * transform.transform;
-            pip.vs.matModel = transform.transform;
-            pip.vs.matNormal = glm::transpose(glm::inverse(transform.transform));
-        }
+        pip.vs.mvp = gl::state.viewProj * transform.transform;
+        pip.vs.matModel = transform.transform;
+        pip.vs.matNormal = glm::transpose(glm::inverse(transform.transform));
 
         if (material.tintable) {
             pip.fs.albedoTint = Vec4(model.tint, 1.f);

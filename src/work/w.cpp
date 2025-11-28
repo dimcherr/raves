@@ -59,34 +59,6 @@ void work::UpdateGame() {
 }
 
 static void UpdateMusicBox() {
-    for (auto [entity, part, transform, body, inventoryItem, model] : reg.view<MusicBoxPartComp, TransformComp, BodyComp, InventoryItemComp, ModelComp>().each()) {
-        if (part.completed && part.type != MusicBoxPartComp::base) {
-            auto& musicBox = reg.get<MusicBoxComp>(part.musicBox);
-            auto& basePartTransform = reg.get<TransformComp>(musicBox.base);
-            auto& basePartInventoryItem = reg.get<InventoryItemComp>(musicBox.base);
-
-            transform = basePartTransform;
-            if (part.type == MusicBoxPartComp::crank) {
-                transform.rotation *= Quat({glm::fract(musicBox.windingPercent) * tun::pi * 2.f, 0.f, 0.f});
-            } else if (part.type == MusicBoxPartComp::statue) {
-                transform.rotation *= Quat({0.f, glm::fract(musicBox.windingPercent) * tun::pi * 2.f, 0.f});
-            }
-
-            tun::UpdateTransform(entity);
-            auto& bodyInterface = phys::state->physicsSystem.GetBodyInterface();
-            bodyInterface.SetPositionAndRotation(
-                body.id,
-                Convert(transform.translation),
-                Convert(transform.rotation),
-                JPH::EActivation::Activate
-            );
-
-            model.active = false;
-            part.interactable().active = false;
-
-            inventoryItem = basePartInventoryItem;
-        }
-    }
 }
 
 static void UpdatePlayer() {
@@ -173,10 +145,6 @@ static void UpdateDoors() {
 }
 
 static void UpdateSubtitles() {
-    if (state.gameTime > 1.5f && !acue::firstRoom().played) {
-        work::PlaySubtitle(acue::firstRoom);
-    }
-
     if (ainput::skipSub().started) {
         if (reg.valid(state.currentSubtitle)) {
             auto& sub = reg.get<SubtitleComp>(state.currentSubtitle);

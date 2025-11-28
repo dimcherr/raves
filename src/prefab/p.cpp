@@ -73,9 +73,6 @@ void prefab::Game() {
 
     prefab::Skybox();
 
-    prefab::MusicBox(MusicBoxComp::green);
-    prefab::MusicBox(MusicBoxComp::yellow);
-    prefab::MusicBox(MusicBoxComp::purple);
     prefab::PartInventory();
 
     for (auto [platformEntity, platform] : reg.view<PlatformComp>().each()) {
@@ -96,49 +93,7 @@ void prefab::Game() {
         }
     }
 
-    for (auto [characterEntity, character] : reg.view<CharacterComp>().each()) {
-        for (auto [musicBoxEntity, musicBoxPart, model] : reg.view<MusicBoxPartComp, ModelComp>().each()) {
-            auto& inventoryItem = reg.emplace<InventoryItemComp>(musicBoxEntity);
-            inventoryItem.inInventory = tun::CreateTween(3.f, TweenComp::once);
-            reg.get<TweenComp>(inventoryItem.inInventory).delta = 0.f;
-            inventoryItem.inventory = characterEntity;
-
-            //if (musicBoxPart.type != MusicBoxPartComp::base) {
-            // TODO TEST CODE COMPLETED EVERYTHING
-
-            for (auto [inventoryEntity, inventory] : reg.view<InventoryComp>().each()) {
-                if (inventory.inventoryIndex == 1) {
-                    inventoryItem.inventory = inventoryEntity;
-                }
-            }
-
-            #if 0
-            musicBoxPart.completed = true;
-            inventoryItem.inventory = characterEntity;
-            //for (auto [inventoryEntity, inventory] : reg.view<InventoryComp>().each()) {
-                //if (inventory.inventoryIndex == 1) {
-                    //inventoryItem.inventory = inventoryEntity;
-                //}
-            //}
-            #endif
-
-            //}
-
-            if (musicBoxPart.inHandModelName.length() == 0) {
-                model.active = false;
-                model.visible = false;
-            }
-        }
-    }
-
     asound::theme().SetPlayed(true);
-
-    #if 0
-    sound::StopMusic(asound::theme().music);
-    sound::StopMusic(asound::themeGreen().music);
-    sound::StopMusic(asound::themeBlue().music);
-    sound::StopMusic(asound::themeRed().music);
-    #endif
 }
 
 Entity prefab::PartInventory() {
@@ -189,31 +144,6 @@ Entity prefab::PlatformEnd(const gltf::ModelParams& params) {
     return params.entity;
 }
 
-Entity prefab::MusicBox(MusicBoxComp::Type type) {
-    Entity entity = reg.create();
-    auto& musicBox = reg.emplace<MusicBoxComp>(entity);
-    musicBox.type = type;
-    for (auto [partEntity, part] : reg.view<MusicBoxPartComp>().each()) {
-        if (part.musicBoxType == type) {
-            part.musicBox = entity;
-            if (part.type == MusicBoxPartComp::base) {
-                musicBox.base = partEntity;
-            } else if (part.type == MusicBoxPartComp::crank) {
-                musicBox.crank = partEntity;
-            } else if (part.type == MusicBoxPartComp::statue) {
-                musicBox.statue = partEntity;
-            }
-        }
-    }
-
-    musicBox.onSet = tun::CreateEvent();
-    musicBox.onWindUp = tun::CreateTween(2.f, TweenComp::once);
-    musicBox.unwindingSpeed = 0.3125f;
-    musicBox.maxWinding = 2.5f;
-
-    return entity;
-}
-
 Entity prefab::Switch(const gltf::ModelParams& params) {
     Entity entity = prefab::StaticBody(params);
     auto& model = reg.get<ModelComp>(params.entity);
@@ -249,46 +179,6 @@ Entity prefab::SwitchStick(const gltf::ModelParams& params) {
     } else if (type == "Purple") {
         model.tint = tun::purple;
         switchStickComp.type = MusicBoxComp::purple;
-    }
-
-    return entity;
-}
-
-Entity prefab::MusicBoxPart(const gltf::ModelParams& params) {
-    Entity entity = prefab::PickableBody(params);
-
-    auto& model = reg.get<ModelComp>(params.entity);
-
-    String inHandModelName = params.GetStringParam("InHand");
-    if (inHandModelName.length() > 0) {
-        auto& partComp = reg.emplace<MusicBoxPartComp>(entity);
-
-        partComp.inHandModelName = inHandModelName;
-        partComp.interactable = tun::CreateInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);
-
-        String musicBoxType = params.GetStringParam("Type");
-        if (musicBoxType == "Purple") {
-            model.tint = tun::purple;
-            partComp.musicBoxType = MusicBoxComp::purple;
-        } else if (musicBoxType == "Yellow") {
-            model.tint = tun::yellow;
-            partComp.musicBoxType = MusicBoxComp::yellow;
-        } else if (musicBoxType == "Green") {
-            model.tint = tun::green;
-            partComp.musicBoxType = MusicBoxComp::green;
-        }
-
-        String partType = params.GetStringParam("Part");
-        if (partType == "Crank") {
-            partComp.type = MusicBoxPartComp::crank;
-        } else if (partType == "Base") {
-            partComp.type = MusicBoxPartComp::base;
-        } else if (partType == "Statue") {
-            partComp.type = MusicBoxPartComp::statue;
-        }
-    } else {
-        model.visible = false;
-        model.active = false;
     }
 
     return entity;

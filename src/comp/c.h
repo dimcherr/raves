@@ -37,21 +37,6 @@ struct SwitchStickComp {
     MusicBoxComp::Type type {MusicBoxComp::Type::green};
 };
 
-struct MusicBoxPartComp {
-    enum Type {
-        crank,
-        base,
-        statue,
-    };
-
-    Entity musicBox {entt::null};
-    MusicBoxComp::Type musicBoxType {MusicBoxComp::green};
-    Type type {crank};
-    String inHandModelName {};
-    Thing<InteractableComp> interactable {};
-    bool completed {false};
-};
-
 struct PlatformComp {
     String endName {};
     Entity end {entt::null};

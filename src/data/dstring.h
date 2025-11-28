@@ -32,6 +32,8 @@ extern LocString putGoldenTree;
 extern LocString talk;
 extern LocString give;
 extern LocString look;
+extern LocString turnOn;
+extern LocString turnOff;
 
 extern LocString tooltipPlaceholder;
 extern LocString clickToContinueWithTab;

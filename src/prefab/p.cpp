@@ -181,7 +181,7 @@ Entity prefab::SwitchStick(const gltf::ModelParams& params) {
         switchStickComp.type = MusicBoxComp::purple;
     }
 
-    switchStickComp.interactable = tun::CreateInteractable(entity, tun::vecZero);
+    switchStickComp.interactable = tun::CreateInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);
 
     return entity;
 }

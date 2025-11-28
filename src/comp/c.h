@@ -35,7 +35,8 @@ struct SwitchComp {
 
 struct SwitchStickComp {
     MusicBoxComp::Type type {MusicBoxComp::Type::green};
-    Thing<InteractableComp> interactable;
+    Thing<InteractableComp> interactable {};
+    bool turnedOn {false};
 };
 
 struct PlatformComp {

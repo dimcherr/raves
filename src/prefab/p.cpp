@@ -182,6 +182,8 @@ Entity prefab::SwitchStick(const gltf::ModelParams& params) {
     }
 
     switchStickComp.interactable = tun::CreateInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);
+    switchStickComp.turnedOn = tun::CreateTween(5.f, TweenComp::once);
+    switchStickComp.turnedOn().delta = 0.f;
 
     return entity;
 }

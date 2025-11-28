@@ -44,16 +44,35 @@ void work::UpdateInteract() {
         for (auto [tooltipEntity, bounds, material, text] : reg.view<TooltipComp, BoundsComp, MaterialTextComp, TextComp>().each()) {
             if (auto* interactable = reg.try_get<InteractableComp>(character.interactable)) {
                 if (auto* switchStick = reg.try_get<SwitchStickComp>(interactable->parentBody)) {
-                    if (switchStick->turnedOn) {
+                    if (switchStick->turnedOn().time > 0.5f) {
                         text.text = &astring::turnOff;
                     } else {
                         text.text = &astring::turnOn;
                     }
                     material.opacity = tun::CurveAuto(interactable->onHover().time);
+
+                    if (ainput::interact().started) {
+                        if (switchStick->turnedOn().time < 0.5f) {
+                            switchStick->turnedOn().delta = 1.f;
+                        } else {
+                            switchStick->turnedOn().delta = -1.f;
+                        }
+                    }
                 }
             } else {
                 material.opacity = 0.f;
             }
+        }
+    }
+
+    for (auto [entity, switchStick, transform, body] : reg.view<SwitchStickComp, TransformComp, BodyComp>().each()) {
+        if (switchStick.turnedOn().active) {
+            float pitch = tun::Lerp(0.f, -glm::radians(45.f), tun::CurveAuto(switchStick.turnedOn().time));
+            transform.rotation = transform.baseRotation * Quat({pitch, 0.f, 0.f});
+            tun::UpdateTransform(entity);
+            phys::state->physicsSystem.GetBodyInterface().SetRotation(body.id, Convert(transform.rotation), JPH::EActivation::Activate);
+
+            tun::log("switch stick turned on: {}", switchStick.turnedOn().time);
         }
     }
 }

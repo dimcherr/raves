@@ -7,8 +7,8 @@
 struct MusicBoxComp {
     enum Type {
         green,
-        red,
-        blue,
+        yellow,
+        purple,
         count,
     };
 
@@ -27,6 +27,14 @@ struct MusicBoxComp {
     bool isWinding {false};
     bool isHolding {false};
     float rotatingDelta {0.f};
+};
+
+struct SwitchComp {
+    MusicBoxComp::Type type {MusicBoxComp::Type::green};
+};
+
+struct SwitchStickComp {
+    MusicBoxComp::Type type {MusicBoxComp::Type::green};
 };
 
 struct MusicBoxPartComp {

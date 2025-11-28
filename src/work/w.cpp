@@ -85,244 +85,22 @@ static void UpdateMusicBox() {
             part.interactable().active = false;
 
             inventoryItem = basePartInventoryItem;
-            // TODO FOR ANIMATION
-            //if (part.type == MusicBoxPartComp::crank) {
-                //inventoryItem.index += 1;
-            //} else if (part.type == MusicBoxPartComp::statue) {
-                //inventoryItem.index += 2;
-            //}
-        }
-    }
-
-    // TODO DEBUGGGG
-    #if 0
-    for (auto [entity, musicBox] : reg.view<MusicBoxComp>().each()) {
-        if (musicBox.type == MusicBoxComp::red) {
-            if (musicBox.type == MusicBoxComp::red || musicBox.type == MusicBoxComp::blue) {
-                if (ainput::windRed().active) {
-                    musicBox.isHolding = true;
-                    if (musicBox.windingPercent < musicBox.maxWinding) {
-                        if (!musicBox.isWinding) {
-                            musicBox.onWindUp().delta = 1.f;
-                            musicBox.onWindUp().time = 0.f;
-                            musicBox.isWinding = true;
-                        }
-                    } else {
-                        musicBox.baseWindingPercent = musicBox.maxWinding;
-                        musicBox.windingPercent = musicBox.maxWinding;
-                        musicBox.isWinding = false;
-                    }
-                } else {
-                    musicBox.isHolding = false;
-                    musicBox.isWinding = false;
-                }
-            } else if (musicBox.type == MusicBoxComp::green) {
-                if (ainput::windRed().active) {
-                    musicBox.rotatingDelta = 1.f;
-                } else if (ainput::windUpMusicBoxReverse().active) {
-                    musicBox.rotatingDelta = -1.f;
-                } else {
-                    musicBox.rotatingDelta = 0.f;
-                }
-            }
-        }
-        else if (musicBox.type == MusicBoxComp::blue) {
-            if (musicBox.type == MusicBoxComp::red || musicBox.type == MusicBoxComp::blue) {
-                if (ainput::windBlue().active) {
-                    musicBox.isHolding = true;
-                    if (musicBox.windingPercent < musicBox.maxWinding) {
-                        if (!musicBox.isWinding) {
-                            musicBox.onWindUp().delta = 1.f;
-                            musicBox.onWindUp().time = 0.f;
-                            musicBox.isWinding = true;
-                        }
-                    } else {
-                        musicBox.baseWindingPercent = musicBox.maxWinding;
-                        musicBox.windingPercent = musicBox.maxWinding;
-                        musicBox.isWinding = false;
-                    }
-                } else {
-                    musicBox.isHolding = false;
-                    musicBox.isWinding = false;
-                }
-            } else if (musicBox.type == MusicBoxComp::green) {
-                if (ainput::windBlue().active) {
-                    musicBox.rotatingDelta = 1.f;
-                } else if (ainput::windUpMusicBoxReverse().active) {
-                    musicBox.rotatingDelta = -1.f;
-                } else {
-                    musicBox.rotatingDelta = 0.f;
-                }
-            }
-        }
-        else if (musicBox.type == MusicBoxComp::green) {
-            if (musicBox.type == MusicBoxComp::red || musicBox.type == MusicBoxComp::blue) {
-                if (ainput::windGreen().active) {
-                    musicBox.isHolding = true;
-                    if (musicBox.windingPercent < musicBox.maxWinding) {
-                        if (!musicBox.isWinding) {
-                            musicBox.onWindUp().delta = 1.f;
-                            musicBox.onWindUp().time = 0.f;
-                            musicBox.isWinding = true;
-                        }
-                    } else {
-                        musicBox.baseWindingPercent = musicBox.maxWinding;
-                        musicBox.windingPercent = musicBox.maxWinding;
-                        musicBox.isWinding = false;
-                    }
-                } else {
-                    musicBox.isHolding = false;
-                    musicBox.isWinding = false;
-                }
-            } else if (musicBox.type == MusicBoxComp::green) {
-                if (ainput::windGreen().active) {
-                    musicBox.rotatingDelta = 1.f;
-                } else if (ainput::windUpMusicBoxReverse().active) {
-                    musicBox.rotatingDelta = -1.f;
-                } else {
-                    musicBox.rotatingDelta = 0.f;
-                }
-            }
-        }
-    }
-    #endif
-
-    for (auto [entity, weapon] : reg.view<WeaponComp>().each()) {
-        if (state.gameOver) continue;
-
-        if (reg.any_of<MusicBoxPartComp>(weapon.weaponModel) && reg.get<MusicBoxPartComp>(weapon.weaponModel).type == MusicBoxPartComp::base) {
-            auto& musicBox = reg.get<MusicBoxComp>(reg.get<MusicBoxPartComp>(weapon.weaponModel).musicBox);
-            if (musicBox.type == MusicBoxComp::red || musicBox.type == MusicBoxComp::blue) {
-                if (ainput::windUpMusicBox().active) {
-                    musicBox.isHolding = true;
-                    if (musicBox.windingPercent < musicBox.maxWinding) {
-                        if (!musicBox.isWinding) {
-                            musicBox.onWindUp().delta = 1.f;
-                            musicBox.onWindUp().time = 0.f;
-                            asound::windUp().Play(0.5f, tun::GetRandomFloat(0.95f, 1.05f));
-                            musicBox.isWinding = true;
-                        }
-                    } else {
-                        musicBox.baseWindingPercent = musicBox.maxWinding;
-                        musicBox.windingPercent = musicBox.maxWinding;
-                        musicBox.isWinding = false;
-                    }
-                } else {
-                    musicBox.isHolding = false;
-                    musicBox.isWinding = false;
-                }
-            } else if (musicBox.type == MusicBoxComp::green) {
-                if (ainput::windUpMusicBox().active) {
-                    musicBox.rotatingDelta = 1.f;
-                    musicBox.isPlaying = true;
-                } else if (ainput::windUpMusicBoxReverse().active) {
-                    musicBox.rotatingDelta = -1.f;
-                    musicBox.isPlaying = true;
-                } else {
-                    musicBox.rotatingDelta = 0.f;
-                    musicBox.isPlaying = false;
-                }
-            }
-        }
-    }
-
-    for (auto [entity, musicBox] : reg.view<MusicBoxComp>().each()) {
-        if (musicBox.type == MusicBoxComp::green) {
-            if (!ainput::windUpMusicBox().active) {
-                musicBox.rotatingDelta = 0.f;
-                musicBox.isPlaying = false;
-            }
-        }
-
-        if (!ainput::windUpMusicBox().active) {
-            musicBox.isWinding = false;
-            musicBox.isHolding = false;
-        }
-
-        if (!state.gameOver) {
-            if (musicBox.type == MusicBoxComp::green) {
-                asound::themeGreen().fading().speed = 1.f;
-                asound::themeGreen().SetPlayed(musicBox.isPlaying);
-            } else if (musicBox.type == MusicBoxComp::red) {
-                asound::themeRed().fading().speed = 1.f;
-                asound::themeRed().SetPlayed(musicBox.isPlaying);
-            } else if (musicBox.type == MusicBoxComp::blue) {
-                asound::themeBlue().fading().speed = 1.f;
-                asound::themeBlue().SetPlayed(musicBox.isPlaying);
-            }
-        }
-
-        if (musicBox.type != MusicBoxComp::green) {
-            if (!musicBox.isWinding) {
-                musicBox.onWindUp().delta = 0.f;
-                musicBox.onWindUp().time = 0.f;
-                if (!musicBox.isHolding) {
-                    musicBox.windingPercent -= state.deltaTime * musicBox.unwindingSpeed;
-                    if (musicBox.windingPercent > 0.f && !musicBox.isHolding && !musicBox.isWinding) {
-                        musicBox.isPlaying = true;
-                    }
-                }
-                musicBox.baseWindingPercent = musicBox.windingPercent;
-                if (musicBox.windingPercent <= 0.f) {
-                    musicBox.windingPercent = 0.f;
-                    musicBox.isPlaying = false;
-                }
-            }
-
-            if (musicBox.isHolding || musicBox.isWinding) {
-                musicBox.isPlaying = false;
-            }
-
-            if (musicBox.onWindUp().onEnd().started) {
-                musicBox.isWinding = false;
-                musicBox.baseWindingPercent = musicBox.windingPercent;
-            }
-
-            if (musicBox.isWinding) {
-                musicBox.windingPercent = musicBox.baseWindingPercent + tun::CurveAuto(musicBox.onWindUp().time) * 0.5f;
-                if (musicBox.windingPercent > 0.f && !musicBox.isHolding && !musicBox.isWinding) {
-                    musicBox.isPlaying = true;
-                }
-            }
-        } else {
-            musicBox.windingPercent += state.deltaTime * musicBox.rotatingDelta * musicBox.unwindingSpeed;
-        }
-
-        for (auto [platformEntity, platform] : reg.view<PlatformComp>().each()) {
-            if (platform.musicBoxType == musicBox.type) {
-                if (musicBox.type == MusicBoxComp::red || musicBox.type == MusicBoxComp::blue) {
-                    platform.winding = musicBox.windingPercent / musicBox.maxWinding;
-                } else if (musicBox.type == MusicBoxComp::green) {
-                    platform.winding = musicBox.rotatingDelta;
-                }
-            }
         }
     }
 }
 
 static void UpdatePlayer() {
-    //if (ainput::respawn().started) {
-        //for (auto [entity, character, body, transform, camera] : reg.view<CharacterComp, BodyComp, TransformComp, CameraComp>().each()) {
-            //for (auto [entity, spawnTransform] : reg.view<SpawnPointCharacterComp, TransformComp>().each()) {
-                //transform = spawnTransform;
-                //character.character->SetPosition(Convert(transform.translation));
-                //character.character->SetRotation(Convert(transform.rotation));
-                //camera.yaw = 0.f;
-                //camera.pitch = 0.f;
-            //}
-        //}
-    //}
 }
 
 static void UpdatePlatforms() {
     for (auto [characterEntity, character] : reg.view<CharacterComp>().each()) {
         for (auto [entity, platform, transform, body, model] : reg.view<PlatformComp, TransformComp, BodyComp, ModelComp>().each()) {
-            if (platform.musicBoxType == MusicBoxComp::blue) {
-                model.tint = tun::blue;
+            if (platform.musicBoxType == MusicBoxComp::yellow) {
+                model.tint = tun::yellow;
             } else if (platform.musicBoxType == MusicBoxComp::green) {
                 model.tint = tun::green;
-            } else if (platform.musicBoxType == MusicBoxComp::red) {
-                model.tint = tun::red;
+            } else if (platform.musicBoxType == MusicBoxComp::purple) {
+                model.tint = tun::purple;
             }
 
             Vec prevTranslation = transform.translation;
@@ -331,36 +109,17 @@ static void UpdatePlatforms() {
             // Update transform based on lerp
             auto& endTransform = reg.get<TransformComp>(platform.end);
 
-            if (platform.musicBoxType == MusicBoxComp::red) {
-                platform.time = platform.winding + platform.offset;
-                if (platform.time > 1.f) {
-                    platform.time = 2.f - platform.time;
-                }
-                platform.linearTime = platform.time;
-            } else if (platform.musicBoxType == MusicBoxComp::blue) {
-                platform.linearTime += state.deltaTime * platform.speed * platform.delta * (1.f - platform.winding);
-                if (platform.linearTime > 2.f) {
-                    platform.linearTime -= 2.f;
-                } else if (platform.linearTime < 0.f) {
-                    platform.linearTime += 2.f;
-                }
-                if (platform.linearTime <= 1.f) {
-                    platform.time = platform.linearTime;
-                } else {
-                    platform.time = 2.f - platform.linearTime;
-                }
-            } else if (platform.musicBoxType == MusicBoxComp::green) {
-                platform.linearTime += state.deltaTime * platform.speed * platform.winding;
-                if (platform.linearTime > 2.f) {
-                    platform.linearTime -= 2.f;
-                } else if (platform.linearTime < 0.f) {
-                    platform.linearTime += 2.f;
-                }
-                if (platform.linearTime <= 1.f) {
-                    platform.time = platform.linearTime;
-                } else {
-                    platform.time = 2.f - platform.linearTime;
-                }
+            platform.winding = 1.f;
+            platform.linearTime += state.deltaTime * platform.speed * platform.winding;
+            if (platform.linearTime > 2.f) {
+                platform.linearTime -= 2.f;
+            } else if (platform.linearTime < 0.f) {
+                platform.linearTime += 2.f;
+            }
+            if (platform.linearTime <= 1.f) {
+                platform.time = platform.linearTime;
+            } else {
+                platform.time = 2.f - platform.linearTime;
             }
 
             float rawTime = glm::clamp(platform.time, 0.f, 1.f);

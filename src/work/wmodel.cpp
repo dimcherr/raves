@@ -27,6 +27,8 @@ void work::LoadScene() {
         {"PlatformStart", prefab::PlatformStart},
         {"PlatformEnd", prefab::PlatformEnd},
         {"MusicBox", prefab::MusicBoxPart},
+        {"Switch", prefab::Switch},
+        {"SwitchStick", prefab::SwitchStick},
 
         {"SpawnAnimation", prefab::SpawnPointAnimation},
         {"Door", prefab::Door},

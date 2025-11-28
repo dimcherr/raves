@@ -64,7 +64,7 @@ void work::UpdateInteract() {
                             MusicBoxComp::Type type {MusicBoxComp::Type::green};
                             int count {0};
                         };
-                        List<PartData> partDataList {{MusicBoxComp::green}, {MusicBoxComp::red}, {MusicBoxComp::blue}};
+                        List<PartData> partDataList {{MusicBoxComp::green}, {MusicBoxComp::yellow}, {MusicBoxComp::purple}};
 
                         for (auto& data : partDataList) {
                             for (Entity itemEntity : localInventory.items) {

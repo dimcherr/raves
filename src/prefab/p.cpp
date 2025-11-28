@@ -74,8 +74,8 @@ void prefab::Game() {
     prefab::Skybox();
 
     prefab::MusicBox(MusicBoxComp::green);
-    prefab::MusicBox(MusicBoxComp::red);
-    prefab::MusicBox(MusicBoxComp::blue);
+    prefab::MusicBox(MusicBoxComp::yellow);
+    prefab::MusicBox(MusicBoxComp::purple);
     prefab::PartInventory();
 
     for (auto [platformEntity, platform] : reg.view<PlatformComp>().each()) {
@@ -171,10 +171,10 @@ Entity prefab::PlatformStart(const gltf::ModelParams& params) {
     platformComp.startRotation = reg.get<TransformComp>(entity).rotation;
 
     String musicBoxType = params.GetStringParam("MusicBoxType");
-    if (musicBoxType == "Blue") {
-        platformComp.musicBoxType = MusicBoxComp::blue;
-    } else if (musicBoxType == "Red") {
-        platformComp.musicBoxType = MusicBoxComp::red;
+    if (musicBoxType == "Purple") {
+        platformComp.musicBoxType = MusicBoxComp::purple;
+    } else if (musicBoxType == "Yellow") {
+        platformComp.musicBoxType = MusicBoxComp::yellow;
     } else if (musicBoxType == "Green") {
         platformComp.musicBoxType = MusicBoxComp::green;
     }
@@ -214,6 +214,46 @@ Entity prefab::MusicBox(MusicBoxComp::Type type) {
     return entity;
 }
 
+Entity prefab::Switch(const gltf::ModelParams& params) {
+    Entity entity = prefab::StaticBody(params);
+    auto& model = reg.get<ModelComp>(params.entity);
+    auto& switchComp = reg.emplace<SwitchComp>(entity);
+
+    String type = params.GetStringParam("Type");
+    if (type == "Green") {
+        model.tint = tun::green;
+        switchComp.type = MusicBoxComp::green;
+    } else if (type == "Yellow") {
+        model.tint = tun::yellow;
+        switchComp.type = MusicBoxComp::yellow;
+    } else if (type == "Purple") {
+        model.tint = tun::purple;
+        switchComp.type = MusicBoxComp::purple;
+    }
+
+    return entity;
+}
+
+Entity prefab::SwitchStick(const gltf::ModelParams& params) {
+    Entity entity = prefab::StaticBody(params);
+    auto& model = reg.get<ModelComp>(params.entity);
+    auto& switchStickComp = reg.emplace<SwitchStickComp>(entity);
+
+    String type = params.GetStringParam("Type");
+    if (type == "Green") {
+        model.tint = tun::green;
+        switchStickComp.type = MusicBoxComp::green;
+    } else if (type == "Yellow") {
+        model.tint = tun::yellow;
+        switchStickComp.type = MusicBoxComp::yellow;
+    } else if (type == "Purple") {
+        model.tint = tun::purple;
+        switchStickComp.type = MusicBoxComp::purple;
+    }
+
+    return entity;
+}
+
 Entity prefab::MusicBoxPart(const gltf::ModelParams& params) {
     Entity entity = prefab::PickableBody(params);
 
@@ -227,12 +267,12 @@ Entity prefab::MusicBoxPart(const gltf::ModelParams& params) {
         partComp.interactable = tun::CreateInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);
 
         String musicBoxType = params.GetStringParam("Type");
-        if (musicBoxType == "Blue") {
-            model.tint = tun::blue;
-            partComp.musicBoxType = MusicBoxComp::blue;
-        } else if (musicBoxType == "Red") {
-            model.tint = tun::red;
-            partComp.musicBoxType = MusicBoxComp::red;
+        if (musicBoxType == "Purple") {
+            model.tint = tun::purple;
+            partComp.musicBoxType = MusicBoxComp::purple;
+        } else if (musicBoxType == "Yellow") {
+            model.tint = tun::yellow;
+            partComp.musicBoxType = MusicBoxComp::yellow;
         } else if (musicBoxType == "Green") {
             model.tint = tun::green;
             partComp.musicBoxType = MusicBoxComp::green;

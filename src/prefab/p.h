@@ -14,5 +14,7 @@ Entity PartInventory();
 Entity Skybox();
 Entity Checkpoint(const gltf::ModelParams& params);
 Entity CheckpointVolume(const gltf::ModelParams& params);
+Entity Switch(const gltf::ModelParams& params);
+Entity SwitchStick(const gltf::ModelParams& params);
 
 }

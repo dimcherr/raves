@@ -172,6 +172,10 @@ Entity prefab::Switch(const gltf::ModelParams& params) {
         model.tint = tun::purple;
         switchComp.type = MusicBoxComp::purple;
         switchComp.switchState = &purpleSwitchState;
+    } else {
+        model.tint = tun::green;
+        switchComp.type = MusicBoxComp::green;
+        switchComp.switchState = &greenSwitchState;
     }
 
     return entity;
@@ -195,6 +199,10 @@ Entity prefab::SwitchStick(const gltf::ModelParams& params) {
         model.tint = tun::purple;
         switchStickComp.type = MusicBoxComp::purple;
         switchStickComp.switchState = &purpleSwitchState;
+    } else {
+        model.tint = tun::green;
+        switchStickComp.type = MusicBoxComp::green;
+        switchStickComp.switchState = &greenSwitchState;
     }
 
     switchStickComp.interactable = tun::CreateInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);

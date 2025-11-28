@@ -32,3 +32,9 @@ inline void terror(std::format_string<Args...> fmt, Args&&... args) {
     std::cout << "[ERROR]: " << std::vformat(fmt.get(), std::make_format_args(args...)) << std::endl;
 }
 
+template<typename ...Args>
+inline void tpanic(std::format_string<Args...> fmt, Args&&... args) {
+    std::cout << "[ERROR]: " << std::vformat(fmt.get(), std::make_format_args(args...)) << std::endl;
+    exit(1);
+}
+

@@ -166,7 +166,9 @@ namespace tphys {
 
     inline State* state {};
 
-    void init();
+    void create();
+    void update();
+    void destroy();
     bool bodiesIntersect(JPH::BodyID bodyID1, JPH::BodyID bodyID2);
 }
 

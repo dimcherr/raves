@@ -6,7 +6,7 @@
 static void trace(const char *inFMT, ...);
 static bool assertFailed(const char *inExpression, const char *inMessage, const char *inFile, unsigned int inLine);
 
-void tphys::init() {
+void tphys::create() {
     JPH::Trace = &trace;
     #ifdef JPH_ENABLE_ASSERTS
     JPH::AssertFailed = &assertFailed;
@@ -28,7 +28,15 @@ void tphys::init() {
         state->objectObjectFilter
     );
 
-    tlog("tphys init");
+    tlog("tphys create");
+}
+
+void tphys::update() {
+
+}
+
+void tphys::destroy() {
+
 }
 
 bool tphys::bodiesIntersect(JPH::BodyID bodyId1, JPH::BodyID bodyId2) {

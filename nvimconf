@@ -428,7 +428,7 @@ function RunApp()
             else
                 CloseQuickfix()
 
-                local logfile = "tunlog"
+                local logfile = "tun.log"
                 if vim.fn.filereadable(logfile) == 1 then
                     os.remove(logfile)
                 end
@@ -463,6 +463,7 @@ end
 
 vim.keymap.set("n", "<leader>bb", RunApp)
 vim.keymap.set("n", "<leader>hh", RunLint)
+vim.keymap.set("n", "<leader>ll", function() vim.cmd("e tun.log") end)
 
 vim.api.nvim_create_autocmd('LspRequest', {
   callback = function(args)
@@ -480,4 +481,6 @@ vim.api.nvim_create_autocmd('LspRequest', {
 vim.opt.errorformat:append({
     [[%*[^:]:%*[^:]:%*[^:]:%f:%m]],
 })
+
+
 

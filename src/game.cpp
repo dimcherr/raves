@@ -2,28 +2,31 @@
 #include "tun/tlog.h"
 #include "tun/tphys.h"
 #include "tun/tgl.h"
+#include "tun/tgltf.h"
 #ifdef OS_WEB
 #include <emscripten.h>
 #endif
 
 void game::create() {
     tlog("create");
-    tphys::init();
-    tgl::init();
+    tphys::create();
+    tgl::create();
+    tgltf::open("models/Raves.glb");
     onWebLoad();
 }
 
 void game::update() {
-    //tlog("update");
+    tphys::update();
+    tgl::update();
 }
 
 void game::event(const sapp_event* event) {
-    //tlog("event");
 }
 
 void game::destroy() {
-    tgl::destroy();
     tlog("destroy");
+    tphys::destroy();
+    tgl::destroy();
 }
 
 #ifdef OS_WEB

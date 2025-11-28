@@ -44,18 +44,21 @@ void work::UpdateInteract() {
         for (auto [tooltipEntity, bounds, material, text] : reg.view<TooltipComp, BoundsComp, MaterialTextComp, TextComp>().each()) {
             if (auto* interactable = reg.try_get<InteractableComp>(character.interactable)) {
                 if (auto* switchStick = reg.try_get<SwitchStickComp>(interactable->parentBody)) {
-                    if (switchStick->turnedOn().time > 0.5f) {
-                        text.text = &astring::turnOff;
-                    } else {
-                        text.text = &astring::turnOn;
-                    }
-                    material.opacity = tun::CurveAuto(interactable->onHover().time);
-
-                    if (ainput::interact().started) {
-                        if (switchStick->turnedOn().time < 0.5f) {
-                            switchStick->turnedOn().delta = 1.f;
+                    if (reg.valid(switchStick->switchState->turnedOn.entity)) {
+                        if (switchStick->switchState->turnedOn().time > 0.5f) {
+                            text.text = &astring::turnOff;
                         } else {
-                            switchStick->turnedOn().delta = -1.f;
+                            text.text = &astring::turnOn;
+                        }
+                        material.opacity = tun::CurveAuto(interactable->onHover().time);
+
+                        if (ainput::interact().started) {
+                            if (switchStick->switchState->turnedOn().time < 0.5f) {
+                                switchStick->switchState->turnedOn().delta = 1.f;
+                            } else {
+                                switchStick->switchState->turnedOn().delta = -1.f;
+                            }
+                            reg.get<SoundComp>(asound::lightswitch).Play();
                         }
                     }
                 }
@@ -66,13 +69,45 @@ void work::UpdateInteract() {
     }
 
     for (auto [entity, switchStick, transform, body] : reg.view<SwitchStickComp, TransformComp, BodyComp>().each()) {
-        if (switchStick.turnedOn().active) {
-            float pitch = tun::Lerp(0.f, -glm::radians(45.f), tun::CurveAuto(switchStick.turnedOn().time));
-            transform.rotation = transform.baseRotation * Quat({pitch, 0.f, 0.f});
-            tun::UpdateTransform(entity);
-            phys::state->physicsSystem.GetBodyInterface().SetRotation(body.id, Convert(transform.rotation), JPH::EActivation::Activate);
+        if (reg.valid(switchStick.switchState->turnedOn.entity)) {
+            if (switchStick.switchState->turnedOn().active) {
+                float pitch = tun::Lerp(0.f, -glm::radians(45.f), tun::CurveAuto(switchStick.switchState->turnedOn().time));
+                transform.rotation = transform.baseRotation * Quat({pitch, 0.f, 0.f});
+                tun::UpdateTransform(entity);
+                phys::state->physicsSystem.GetBodyInterface().SetRotation(body.id, Convert(transform.rotation), JPH::EActivation::Activate);
+            }
+        }
+    }
 
-            tun::log("switch stick turned on: {}", switchStick.turnedOn().time);
+    for (auto [entity, switchStick, model] : reg.view<SwitchStickComp, ModelComp>().each()) {
+        if (reg.valid(switchStick.switchState->turnedOn.entity)) {
+            if (switchStick.switchState->turnedOn().time > 0.5f) {
+                if (switchStick.switchState == &greenSwitchState) {
+                    model.tint = tun::green;
+                } else if (switchStick.switchState == &yellowSwitchState) {
+                    model.tint = tun::yellow;
+                } else if (switchStick.switchState == &purpleSwitchState) {
+                    model.tint = tun::purple;
+                }
+            } else {
+                model.tint = tun::white;
+            }
+        }
+    }
+
+    for (auto [entity, switchBase, model] : reg.view<SwitchComp, ModelComp>().each()) {
+        if (reg.valid(switchBase.switchState->turnedOn.entity)) {
+            if (switchBase.switchState->turnedOn().time > 0.5f) {
+                if (switchBase.switchState == &greenSwitchState) {
+                    model.tint = tun::green;
+                } else if (switchBase.switchState == &yellowSwitchState) {
+                    model.tint = tun::yellow;
+                } else if (switchBase.switchState == &purpleSwitchState) {
+                    model.tint = tun::purple;
+                }
+            } else {
+                model.tint = tun::white;
+            }
         }
     }
 }

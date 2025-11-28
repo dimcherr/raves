@@ -94,6 +94,13 @@ void prefab::Game() {
     }
 
     asound::theme().SetPlayed(true);
+
+    greenSwitchState.turnedOn = tun::CreateTween(5.f, TweenComp::once);
+    greenSwitchState.turnedOn().delta = 0.f;
+    yellowSwitchState.turnedOn = tun::CreateTween(5.f, TweenComp::once);
+    yellowSwitchState.turnedOn().delta = 0.f;
+    purpleSwitchState.turnedOn = tun::CreateTween(5.f, TweenComp::once);
+    purpleSwitchState.turnedOn().delta = 0.f;
 }
 
 Entity prefab::PartInventory() {
@@ -128,10 +135,13 @@ Entity prefab::PlatformStart(const gltf::ModelParams& params) {
     String musicBoxType = params.GetStringParam("MusicBoxType");
     if (musicBoxType == "Purple") {
         platformComp.musicBoxType = MusicBoxComp::purple;
+        platformComp.switchState = &purpleSwitchState;
     } else if (musicBoxType == "Yellow") {
         platformComp.musicBoxType = MusicBoxComp::yellow;
+        platformComp.switchState = &yellowSwitchState;
     } else if (musicBoxType == "Green") {
         platformComp.musicBoxType = MusicBoxComp::green;
+        platformComp.switchState = &greenSwitchState;
     }
 
     return entity;
@@ -153,12 +163,15 @@ Entity prefab::Switch(const gltf::ModelParams& params) {
     if (type == "Green") {
         model.tint = tun::green;
         switchComp.type = MusicBoxComp::green;
+        switchComp.switchState = &greenSwitchState;
     } else if (type == "Yellow") {
         model.tint = tun::yellow;
         switchComp.type = MusicBoxComp::yellow;
+        switchComp.switchState = &yellowSwitchState;
     } else if (type == "Purple") {
         model.tint = tun::purple;
         switchComp.type = MusicBoxComp::purple;
+        switchComp.switchState = &purpleSwitchState;
     }
 
     return entity;
@@ -173,17 +186,18 @@ Entity prefab::SwitchStick(const gltf::ModelParams& params) {
     if (type == "Green") {
         model.tint = tun::green;
         switchStickComp.type = MusicBoxComp::green;
+        switchStickComp.switchState = &greenSwitchState;
     } else if (type == "Yellow") {
         model.tint = tun::yellow;
         switchStickComp.type = MusicBoxComp::yellow;
+        switchStickComp.switchState = &yellowSwitchState;
     } else if (type == "Purple") {
         model.tint = tun::purple;
         switchStickComp.type = MusicBoxComp::purple;
+        switchStickComp.switchState = &purpleSwitchState;
     }
 
     switchStickComp.interactable = tun::CreateInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);
-    switchStickComp.turnedOn = tun::CreateTween(5.f, TweenComp::once);
-    switchStickComp.turnedOn().delta = 0.f;
 
     return entity;
 }

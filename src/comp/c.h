@@ -4,6 +4,15 @@
 #include "comp/cinteract.h"
 #include "tun/tmath.h"
 
+struct SwitchState {
+    Thing<TweenComp> turnedOn {};
+    float linearTime {};
+};
+
+inline SwitchState greenSwitchState {};
+inline SwitchState yellowSwitchState {};
+inline SwitchState purpleSwitchState {};
+
 struct MusicBoxComp {
     enum Type {
         green,
@@ -30,16 +39,18 @@ struct MusicBoxComp {
 };
 
 struct SwitchComp {
+    SwitchState* switchState {};
     MusicBoxComp::Type type {MusicBoxComp::Type::green};
 };
 
 struct SwitchStickComp {
+    SwitchState* switchState {};
     MusicBoxComp::Type type {MusicBoxComp::Type::green};
     Thing<InteractableComp> interactable {};
-    Thing<TweenComp> turnedOn {};
 };
 
 struct PlatformComp {
+    SwitchState* switchState {};
     String endName {};
     Entity end {entt::null};
     //Thing<TweenComp> moving {};

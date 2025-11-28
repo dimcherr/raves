@@ -67,12 +67,21 @@ static void UpdatePlayer() {
 static void UpdatePlatforms() {
     for (auto [characterEntity, character] : reg.view<CharacterComp>().each()) {
         for (auto [entity, platform, transform, body, model] : reg.view<PlatformComp, TransformComp, BodyComp, ModelComp>().each()) {
-            if (platform.musicBoxType == MusicBoxComp::yellow) {
-                model.tint = tun::yellow;
-            } else if (platform.musicBoxType == MusicBoxComp::green) {
-                model.tint = tun::green;
-            } else if (platform.musicBoxType == MusicBoxComp::purple) {
-                model.tint = tun::purple;
+            platform.winding = 0.f;
+            if (auto* tween = platform.switchState->turnedOn.Maybe()) {
+                platform.winding = tween->time;
+            }
+
+            if (platform.winding < 0.5f) {
+                model.tint = tun::white;
+            } else {
+                if (platform.musicBoxType == MusicBoxComp::yellow) {
+                    model.tint = tun::yellow;
+                } else if (platform.musicBoxType == MusicBoxComp::green) {
+                    model.tint = tun::green;
+                } else if (platform.musicBoxType == MusicBoxComp::purple) {
+                    model.tint = tun::purple;
+                }
             }
 
             Vec prevTranslation = transform.translation;
@@ -81,7 +90,6 @@ static void UpdatePlatforms() {
             // Update transform based on lerp
             auto& endTransform = reg.get<TransformComp>(platform.end);
 
-            platform.winding = 1.f;
             platform.linearTime += state.deltaTime * platform.speed * platform.winding;
             if (platform.linearTime > 2.f) {
                 platform.linearTime -= 2.f;

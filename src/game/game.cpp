@@ -205,7 +205,7 @@ void game::Update() {
 
     gl::BeginLightingPass();
         for (auto [lightEntity, light, lightTransform] : reg.view<PointLightComp, TransformComp>().each()) {
-            work::DrawLighting(lightTransform.translation, lightTransform.rotation, Vec4(light.color, light.intensity * 5.f));
+            work::DrawLighting(lightTransform.translation, lightTransform.rotation, Vec4(light.color, light.intensity * 1.5f));
         }
     gl::EndRenderPass();
 

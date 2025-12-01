@@ -45,15 +45,6 @@ void work::UpdateGame() {
                 camera.yaw -= tun::pi * 2.f;
             }
             camera.pitch = 0.f;
-            //transform.rotation = transform.baseRotation * Quat({0.f, state.deltaTime, 0.f});
-            //tun::UpdateTransform(characterEntity);
-            //auto& bodyInterface = phys::state->physicsSystem.GetBodyInterface();
-            //bodyInterface.SetPositionAndRotation(
-                //body.id,
-                //Convert(transform.translation),
-                //Convert(transform.rotation),
-                //JPH::EActivation::Activate
-            //);
         }
     }
 }

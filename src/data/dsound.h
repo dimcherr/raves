@@ -8,6 +8,11 @@ extern Music themeGreen;
 extern Music themeRed;
 extern Music themeBlue;
 
+extern Music theme0;
+extern Music theme1;
+extern Music theme2;
+extern Music theme3;
+
 extern Sound stepDefault;
 extern Sound stepVent;
 extern Sound typing;

@@ -71,6 +71,15 @@ static void OnTrigger(JPH::BodyID bodyID) {
                     character.checkpointIndex = volume.index;
                     character.checkpoint = volume.checkpoint;
                 }
+
+                // TODO NEW CHECKPOINT EVENT
+                if (character.checkpointIndex >= 0.f && character.gameOvering().time == 0.f) {
+                    // TRIGGER GAME OVER EVENT
+                    character.gameOvering().time = 0.0001f;
+                    character.gameOvering().delta = 1.f;
+                    character.killFading().time = 0.0001f;
+                    character.killFading().delta = 1.f;
+                }
                 break;
             }
         }
@@ -117,6 +126,8 @@ void game::Create() {
         tun::logpop("game load");
 
         onWebLoad();
+
+    asound::theme0().SetPlayed(true);
     tun::logpop("game create");
 }
 
@@ -222,14 +233,14 @@ void game::Update() {
 
     if (state.gameOver) {
         tun::LockMouse(false);
-        asound::theme().SetPlayed(true);
-        asound::themeGreen().SetPlayed(false);
-        asound::themeBlue().SetPlayed(false);
-        asound::themeRed().SetPlayed(false);
+        asound::theme0().SetPlayed(true);
+        asound::theme1().SetPlayed(true);
+        asound::theme2().SetPlayed(true);
+        asound::theme3().SetPlayed(true);
     }
 
     work::UpdateEvents();
-    state.drawFPS = true;
+    state.drawFPS = false;
     state.mouseDeltaX = 0.f;
     state.mouseDeltaY = 0.f;
 

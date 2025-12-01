@@ -28,6 +28,10 @@ static void UpdateMusicBox();
 static void UpdateKillZ();
 
 void work::UpdateGame() {
+    asound::theme1().SetPlayed(greenSwitchState.turnedOn().time > 0.5f);
+    asound::theme2().SetPlayed(yellowSwitchState.turnedOn().time > 0.5f);
+    asound::theme3().SetPlayed(purpleSwitchState.turnedOn().time > 0.5f);
+
     if (!state.paused) {
         UpdateSubtitles();
         UpdateDoors();
@@ -40,11 +44,13 @@ void work::UpdateGame() {
     if (state.gameOver) {
         for (auto [characterEntity, character, transform, body, camera] : reg.view<CharacterComp, TransformComp, BodyComp, CameraComp>().each()) {
             state.gameOverFade += state.deltaTime * 0.3125f;
-            camera.yaw += state.deltaTime * 0.3125f;
-            if (camera.yaw > tun::pi * 2.f) {
-                camera.yaw -= tun::pi * 2.f;
-            }
-            camera.pitch = 0.f;
+            //camera.yaw += state.deltaTime * 0.3125f;
+            //if (camera.yaw > tun::pi * 2.f) {
+                //camera.yaw -= tun::pi * 2.f;
+            //}
+            camera.yaw = glm::radians(180.f);
+            camera.pitch = glm::radians(10.f);
+
             //transform.rotation = transform.baseRotation * Quat({0.f, state.deltaTime, 0.f});
             //tun::UpdateTransform(characterEntity);
             //auto& bodyInterface = phys::state->physicsSystem.GetBodyInterface();

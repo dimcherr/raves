@@ -90,7 +90,7 @@ void work::UpdatePhysics() {
                 float charSpeed = character.moving ? character.speed : 0.f;
                 float t = glm::clamp(charSpeed, 0.f, 10.f) / 10.f;
                 camera.bobbingIntensity = tun::Lerp(0.05f, 0.01f, t);
-                character.headBobbing().speed = tun::Lerp(1.f, 10.f, t);
+                character.headBobbing().speed = tun::Lerp(0.2f, 5.f, t);
             } else {
                 camera.bobbingIntensity = 0.01f;
                 character.headBobbing().speed = 1.f;

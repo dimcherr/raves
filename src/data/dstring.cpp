@@ -2,7 +2,7 @@
 
 namespace astring {
 
-LocString gameOverText {"The game was made for GMTK Game Jam 2025 by nesobaka", "Игра сделана для GMTK Game Jam 2025 студией nesobaka"};
+LocString gameOverText {"the end", "конец"};
 
 LocString controlsTitle {"Controls", "Управление"};
 LocString controlsMovement {"(WASD) - Movement", "(WASD) - Движение"};
@@ -13,7 +13,7 @@ LocString controlsChoose {"(1-2-3 or Mouse Wheel) - Item selection", "(1-2-3 и�
 LocString controlsTake {"(E) - Take item", "(E) - Подобрать предмет"};
 LocString controlsPause {"(Tab) - Pause", "(Tab) - Пауза"};
 
-LocString gameName {"Raves", "Raves"};
+LocString gameName {"RAVES", "RAVES"};
 LocString play {"Play", "Играть"};
 LocString currentLang {"English", "Русский"};
 LocString mouseSense {"Mouse sensitivity", "Чувствительность мыши"};

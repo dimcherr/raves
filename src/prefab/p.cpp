@@ -37,7 +37,7 @@ void prefab::Game() {
     prefab::FpsView({0.025f, 0.025f}, Color(0.5f, 0.2f, 0.2f), 24.f);
 
     #if 1
-    Entity titleText = prefab::Text(&astring::gameName, {0.05f, 0.1f}, {tun::begin, tun::begin}, 32.f, Color(1.f, 0.85f, 0.8f));
+    Entity titleText = prefab::Text(&astring::gameName, {0.05f, 0.1f}, {tun::begin, tun::begin}, 72.f, Color(1.f, 0.85f, 0.8f));
     reg.emplace<tag::GameName>(titleText);
     reg.emplace<tag::Menu>(titleText);
 
@@ -53,12 +53,12 @@ void prefab::Game() {
     reg.emplace<tag::Menu>(controlsText3);
     Entity controlsText4 = prefab::Text(&astring::controlsRun, {0.05f, 0.65f}, {tun::begin, tun::begin}, 22.f, Color(1.f, 0.85f, 0.8f));
     reg.emplace<tag::Menu>(controlsText4);
-    Entity controlsText5 = prefab::Text(&astring::controlsTake, {0.05f, 0.7f}, {tun::begin, tun::begin}, 22.f, Color(1.f, 0.85f, 0.8f));
-    reg.emplace<tag::Menu>(controlsText5);
-    Entity controlsText6 = prefab::Text(&astring::controlsUse, {0.05f, 0.75f}, {tun::begin, tun::begin}, 22.f, Color(1.f, 0.85f, 0.8f));
-    reg.emplace<tag::Menu>(controlsText6);
-    Entity controlsText7 = prefab::Text(&astring::controlsChoose, {0.05f, 0.8f}, {tun::begin, tun::begin}, 22.f, Color(1.f, 0.85f, 0.8f));
-    reg.emplace<tag::Menu>(controlsText7);
+    //Entity controlsText5 = prefab::Text(&astring::controlsTake, {0.05f, 0.7f}, {tun::begin, tun::begin}, 22.f, Color(1.f, 0.85f, 0.8f));
+    //reg.emplace<tag::Menu>(controlsText5);
+    //Entity controlsText6 = prefab::Text(&astring::controlsUse, {0.05f, 0.75f}, {tun::begin, tun::begin}, 22.f, Color(1.f, 0.85f, 0.8f));
+    //reg.emplace<tag::Menu>(controlsText6);
+    //Entity controlsText7 = prefab::Text(&astring::controlsChoose, {0.05f, 0.8f}, {tun::begin, tun::begin}, 22.f, Color(1.f, 0.85f, 0.8f));
+    //reg.emplace<tag::Menu>(controlsText7);
 
 
     Entity gameOverText = prefab::Text(&astring::gameOverText, {0.5f, 0.5f}, {tun::center, tun::center}, 24.f, Color(1.f, 0.85f, 0.8f));
@@ -66,8 +66,8 @@ void prefab::Game() {
 
     prefab::Button(&astring::play, {0.85f, 0.4f}, tun::white, 72.f, aevent::onPlay);
     prefab::Slider(&astring::mouseSense, {0.95f, 0.6f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.5f, 0.1f, 1.f, aevent::onUpdateMouseSense);
-    prefab::Slider(&astring::soundVolume, {0.95f, 0.68f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.05f, 0.f, 1.f, aevent::onUpdateSoundVolume);
-    prefab::Slider(&astring::musicVolume, {0.95f, 0.76f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.0f, 0.f, 1.f, aevent::onUpdateMusicVolume);
+    prefab::Slider(&astring::soundVolume, {0.95f, 0.68f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.5f, 0.f, 1.f, aevent::onUpdateSoundVolume);
+    prefab::Slider(&astring::musicVolume, {0.95f, 0.76f}, Color(0.9f, 0.9f, 0.9f), 32.f, 0.5f, 0.f, 1.f, aevent::onUpdateMusicVolume);
     prefab::Button(&astring::currentLang, {0.95f, 0.84f}, Color(0.9f, 0.9f, 0.9f), 32.f, aevent::onChangeLang);
     #endif
 
@@ -92,8 +92,6 @@ void prefab::Game() {
             }
         }
     }
-
-    asound::theme().SetPlayed(true);
 
     greenSwitchState.turnedOn = tun::CreateTween(5.f, TweenComp::once);
     greenSwitchState.turnedOn().delta = 0.f;
@@ -205,7 +203,7 @@ Entity prefab::SwitchStick(const gltf::ModelParams& params) {
         switchStickComp.switchState = &greenSwitchState;
     }
 
-    switchStickComp.interactable = tun::CreateInteractable(entity, reg.get<TransformComp>(entity).translation, 2.f);
+    switchStickComp.interactable = tun::CreateInteractable(entity, reg.get<TransformComp>(entity).translation, 5.f);
 
     return entity;
 }

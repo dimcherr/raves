@@ -63,11 +63,11 @@ out vec4 fragColor;
 */
 
 //Number of turbulence waves
-#define TURB_NUM 10.0
+#define TURB_NUM 7.0
 //Turbulence wave amplitude
-#define TURB_AMP 0.7
+#define TURB_AMP 2.0
 //Turbulence wave speed
-#define TURB_SPEED 0.3
+#define TURB_SPEED 0.5
 //Turbulence frequency
 #define TURB_FREQ 2.0
 //Turbulence frequency multiplier

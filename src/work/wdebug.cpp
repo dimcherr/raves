@@ -15,21 +15,21 @@ static void TeleportPlayerToFlyCamera();
 static void ReloadScene();
 
 void work::UpdateDebug() {
-    if (ainput::toggleDebugView().started) {
-        ToggleDebugView();
-    }
-    if (ainput::toggleFPS().started) {
-        state.drawFPS = !state.drawFPS;
-    }
-    if (ainput::toggleFlyMode().started) {
-        ToggleFlyCamera();
-    }
-    if (ainput::teleportPlayerToFlyCamera().started) {
-        TeleportPlayerToFlyCamera();
-    }
-    if (ainput::reloadScene().started) {
-        ReloadScene();
-    }
+    //if (ainput::toggleDebugView().started) {
+        //ToggleDebugView();
+    //}
+    //if (ainput::toggleFPS().started) {
+        //state.drawFPS = !state.drawFPS;
+    //}
+    //if (ainput::toggleFlyMode().started) {
+        //ToggleFlyCamera();
+    //}
+    //if (ainput::teleportPlayerToFlyCamera().started) {
+        //TeleportPlayerToFlyCamera();
+    //}
+    //if (ainput::reloadScene().started) {
+        //ReloadScene();
+    //}
 }
 
 static void ReloadScene() {

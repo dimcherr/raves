@@ -319,7 +319,7 @@ void work::UpdateTurbulence() {
         for (auto [entity, character] : reg.view<CharacterComp>().each()) {
             float gameOverFadeAlpha = tun::Lerp(0.f, 1.f, glm::clamp(state.gameOverFade, 0.f, 8.f) / 8.f);
             material.opacity = tun::CurveAuto(glm::max(glm::max(bounds.fading().time, character.killFading().time), gameOverFadeAlpha));
-            //material.opacity = tun::CurveAuto(bounds.fading().time);
+            material.tint = tun::purple;
         }
     }
 }

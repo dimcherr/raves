@@ -49,7 +49,6 @@ void work::UpdateState() {
     if (aevent::onPlay().started) {
         state.paused = false;
         tun::LockMouse(true);
-        asound::theme().SetPlayed(false);
 
         if (!state.gameStarted) {
             state.gameStarted = true;
@@ -57,7 +56,6 @@ void work::UpdateState() {
     } else if (aevent::onPlay().finished) {
         state.paused = true;
         tun::LockMouse(false);
-        asound::theme().SetPlayed(true);
     }
 
     if (aevent::onChangeLang().started) {

@@ -28,8 +28,8 @@ struct CameraComp {
     float rotationSensitivity {0.2f};
 
     // TODO what is that
-    Vec initialOffset {0.f, 0.99f, 0.f};
-    Vec offset {0.f, 0.99f, 0.f};
+    Vec initialOffset {0.f, 0.75f, 0.f};
+    Vec offset {0.f, 0.75f, 0.f};
 
     // TODO should not be here
     float movementSpeed {5.f};

@@ -134,8 +134,8 @@ Entity prefab::Character() {
     Entity entity = reg.create();
 
     auto& capsule = reg.emplace<CapsuleShapeComp>(entity);
-    capsule.halfHeight = 0.6f;
-    capsule.radius = 0.5f;
+    capsule.halfHeight = 0.5f;
+    capsule.radius = 0.35f;
 
     auto& weapon = reg.emplace<WeaponComp>(entity);
     weapon.inputs.push_back(&ainput::weapon1);
